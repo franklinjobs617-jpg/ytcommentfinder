@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>YT Comment Viewer - Load Millions of Comments Instantly</title>
+  <meta name="description"
+    content="The ultimate YouTube Comment Viewer. Load, sort, and read millions of comments without browser lag. 65% less memory usage than native YouTube." />
+  <link rel="canonical" href="https://www.ytcommentfinder.com/viewer">
+
+  <!-- Fonts: Inter (Shadcn Standard) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Add Socket.IO client library from CDN -->
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <!-- Add Comment Manager -->
+  <script src="./js/comment-manager.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', "sans-serif"],
+          },
+          colors: {
+            border: "var(--border)",
+            input: "var(--input)",
+            ring: "var(--ring)",
+            background: "var(--background)",
+            foreground: "var(--foreground)",
+            primary: {
+              DEFAULT: "var(--primary)",
+              foreground: "var(--primary-foreground)",
+              10: "rgba(59, 130, 246, 0.1)",
+            },
+            secondary: {
+              DEFAULT: "var(--secondary)",
+              foreground: "var(--secondary-foreground)",
+            },
+            muted: {
+              DEFAULT: "var(--muted)",
+              foreground: "var(--muted-foreground)",
+            },
+            accent: {
+              DEFAULT: "var(--accent)",
+              foreground: "var(--accent-foreground)",
+            },
+            card: {
+              DEFAULT: "var(--card)",
+              foreground: "var(--card-foreground)",
+            },
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        },
+      },
+    };
+  </script>
+  <style>
+  :root {
+      /* 与首页统一的基础配色 */
+      --background: #ffffff;
+      --foreground: #09090b;
+      --card: #ffffff;
+      --card-foreground: #09090b;
+      --primary: #3b82f6;
+      --primary-start: #3b82f6;
+      --primary-end: #8b5cf6;
+      --primary-foreground: #ffffff;
+      --primary-hover: #2563eb;
+      --secondary: #f4f4f5;
+      --secondary-foreground: #18181b;
+      --muted: #f4f4f5;
+      --muted-foreground: #71717a;
+      --accent: #f4f4f5;
+      --accent-foreground: #18181b;
+      --border: #e4e4e7;
+      --border-hover: #cbd5e1;
+      --input: #e4e4e7;
+      --radius: 0.75rem;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dark {
+      --background: #09090b;
+      --foreground: #fafafa;
+      --card: #18181b;
+      --card-foreground: #fafafa;
+      --primary: #3b82f6;
+      --primary-start: #3b82f6;
+      --primary-end: #8b5cf6;
+      --primary-foreground: #fafafa;
+      --secondary: #27272a;
+      --secondary-foreground: #fafafa;
+      --muted: #27272a;
+      --muted-foreground: #a1a1aa;
+      --accent: #27272a;
+      --accent-foreground: #fafafa;
+      --border: #27272a;
+      --input: #27272a;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .section-padding {
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+    }
+
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .card-hover:hover {
+      box-shadow: 0 10px 30px -10px rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Comment Card Styles */
+    .comment-card {
+      transition: all 0.3s ease;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background-color: var(--card);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .comment-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary);
+    }
+    
+    .dark .comment-card:hover {
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Button Hover Effects */
+    button {
+      transition: all 0.2s ease;
+    }
+    
+    /* Input Focus Effects */
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      ring: 2px solid var(--primary);
+      ring-offset: 2px;
+      transition: all 0.2s ease;
+    }
+    
+    /* Smooth transitions for all interactive elements */
+    a, button, input, select, textarea {
+      transition: all 0.2s ease;
+    }
+    
+    /* Improve visual hierarchy */
+    .font-semibold {
+      font-weight: 600;
+    }
+    
+    /* Improve spacing */
+    .space-y-4 > * + * {
+      margin-top: 1rem;
+    }
+    
+    /* Improve card shadows */
+    .shadow-sm {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    
+    .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Add subtle animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-fade-in-up {
+      animation: fadeInUp 0.3s ease-out;
+    }
+    
+    /* Improve scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--background);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--muted);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border);
+    }
+    
+    /* Improve tooltip styling */
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--foreground);
+      color: var(--background);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 100;
+      opacity: 0.9;
+      margin-bottom: 0.25rem;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+      background-size: 200% 200%;
+      animation: gradientBG 5s ease infinite;
+    }
+  </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
+    <div class="container mx-auto px-4 h-16 flex justify-between items-center">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 rounded-lg gradient-bg text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+          <i data-lucide="zap" class="w-4 h-4"></i>
+        </div>
+        <span class="font-bold text-lg tracking-tight">YT Finder</span>
+      </a>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
+        <a href="#features" class="hover:text-foreground transition-colors">Features</a>
+        <a href="/first-comment.html" class="hover:text-foreground transition-colors">First Comment</a>
+        <a href="/ai-analysis.html" class="hover:text-foreground transition-colors">AI Analysis</a>
+        <a href="/export-data.html" class="hover:text-foreground transition-colors">Export</a>
+        <a href="/blog/comment-history.html" class="hover:text-foreground transition-colors">Comment History</a>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-4">
+        <button id="theme-toggle" class="p-2 rounded-md hover:bg-muted text-muted-foreground transition-colors">
+          <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+          <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+        </button>
+        
+        <a href="#search" class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium gradient-bg text-white shadow hover:opacity-90 transition-opacity">
+          Get Started
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow pt-16">
+
+    <!-- Hero Section -->
+    <section class="pt-8 pb-16">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+          <div class="p-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-foreground mb-4">YouTube Comment Viewer</h1>
+            <p class="text-muted-foreground mb-6">Paste a YouTube video URL below to start exploring comments efficiently.</p>
+            
+            <!-- URL Input Form -->
+            <div class="relative group">
+              <div
+                class="absolute -inset-1 bg-gradient-to-r from-primary to-blue-400 rounded-lg opacity-20 blur transition duration-500 group-hover:opacity-40"></div>
+              <div
+                class="relative flex flex-col sm:flex-row gap-2 bg-background p-2 rounded-lg border border-border shadow-md">
+                <div class="relative flex-1">
+                  <i data-lucide="play-circle"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground"></i>
+                  <input type="url" id="urlInput" placeholder="Paste YouTube Video URL..."
+                    class="w-full h-12 pl-12 pr-4 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-base" />
+                </div>
+                <button onclick="handleLoad()"
+                  class="h-12 px-8 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-sm whitespace-nowrap">
+                  <i data-lucide="play" class="w-4 h-4"></i>
+                  Load Comments
+                </button>
+              </div>
+            </div>
+            
+            <div class="mt-4 text-center text-sm text-muted-foreground">
+              <p>We've successfully loaded videos with over 500,000+ comments in tests.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Viewer Console Preview (Mockup) -->
+    <section class="border-b border-border pb-20">
+      <div class="container mx-auto px-4 max-w-5xl">
+        <div class="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+          <!-- Toolbar Mockup -->
+          <div class="bg-secondary/50 border-b border-border p-4 flex flex-wrap gap-4 items-center justify-between">
+            <div class="flex flex-wrap items-center gap-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="arrow-up-down" class="w-4 h-4 text-muted-foreground"></i>
+                <select id="sortSelect"
+                  class="bg-transparent text-sm font-medium text-foreground outline-none cursor-pointer">
+                  <option value="dateNewest">Newest First</option>
+                  <option value="dateOldest">Oldest First</option>
+                  <option value="likesMost">Most Liked</option>
+                  <option value="likesLeast">Least Liked</option>
+                </select>
+              </div>
+
+              <div class="h-4 w-px bg-border hidden sm:block"></div>
+
+              <!-- Search Input -->
+              <div class="relative flex items-center">
+                <i data-lucide="search" class="w-4 h-4 text-muted-foreground absolute left-2"></i>
+                <input type="text" id="searchInput" placeholder="Search comments..."
+                  class="pl-8 pr-4 py-1 bg-background border border-border rounded-md text-sm w-40 md:w-64 focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+
+              <div class="h-4 w-px bg-border hidden sm:block"></div>
+
+              <!-- Filter Button -->
+              <button id="filterBtn"
+                class="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span>Filters</span>
+              </button>
+
+              <div class="h-4 w-px bg-border hidden sm:block"></div>
+
+              <!-- Export Buttons -->
+              <div class="flex items-center gap-2">
+                <button onclick="exportComments('csv')" class="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <i data-lucide="file-text" class="w-4 h-4"></i>
+                  <span>CSV</span>
+                </button>
+                <button onclick="exportComments('json')" class="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <i data-lucide="file-code" class="w-4 h-4"></i>
+                  <span>JSON</span>
+                </button>
+              </div>
+            </div>
+            <div class="text-xs font-mono text-muted-foreground" id="commentCount">
+              0 Comments Loaded
+            </div>
+          </div>
+
+          <!-- Filter Panel (Hidden by default) -->
+          <div id="filterPanel" class="bg-background border-b border-border p-4 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-foreground mb-1">Minimum Likes</label>
+                <input type="number" id="minLikesFilter" min="0" value="0"
+                  class="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-foreground mb-1">Comment Length</label>
+                <select id="lengthFilter"
+                  class="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="all">All Lengths</option>
+                  <option value="short">Short (1-50 chars)</option>
+                  <option value="medium">Medium (51-200 chars)</option>
+                  <option value="long">Long (200+ chars)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-foreground mb-1">Start Date</label>
+                <input type="date" id="startDateFilter"
+                  class="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-foreground mb-1">End Date</label>
+                <input type="date" id="endDateFilter"
+                  class="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+            </div>
+            <div class="flex justify-end mt-4 gap-2">
+              <button id="resetFiltersBtn"
+                class="px-4 py-2 text-sm rounded-md border border-border text-foreground hover:bg-secondary">
+                Reset
+              </button>
+              <button id="applyFiltersBtn"
+                class="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
+                Apply Filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Video Info Display -->
+          <div id="videoInfo" class="p-4 bg-background/50 border-b border-border hidden">
+            <div class="flex items-start gap-4">
+              <img id="videoThumbnail" src="" alt="Video Thumbnail" class="w-32 h-20 object-cover rounded-lg">
+              <div class="flex-1">
+                <h3 id="videoTitle" class="font-bold text-foreground text-lg mb-1"></h3>
+                <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span id="viewCount"></span>
+                  <span id="likeCount"></span>
+                  <span id="commentCountInfo"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Comment Statistics Overview -->
+          <div id="commentStats" class="p-4 bg-background/50 border-b border-border hidden">
+            <h3 class="text-sm font-semibold text-foreground mb-3">Comment Statistics</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="bg-card p-3 rounded-lg border border-border">
+                <div class="text-xs text-muted-foreground mb-1">Total Comments</div>
+                <div class="text-xl font-bold text-foreground" id="totalCommentsStat">0</div>
+              </div>
+              <div class="bg-card p-3 rounded-lg border border-border">
+                <div class="text-xs text-muted-foreground mb-1">Avg. Likes</div>
+                <div class="text-xl font-bold text-foreground" id="avgLikeStat">0</div>
+              </div>
+              <div class="bg-card p-3 rounded-lg border border-border">
+                <div class="text-xs text-muted-foreground mb-1">Most Liked</div>
+                <div class="text-xl font-bold text-foreground" id="mostLikedStat">0</div>
+              </div>
+              <div class="bg-card p-3 rounded-lg border border-border">
+                <div class="text-xs text-muted-foreground mb-1">Comments/sec</div>
+                <div class="text-xl font-bold text-foreground" id="commentDensityStat">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments Container -->
+          <div id="commentsContainer" class="p-4 bg-background/50">
+            <!-- Comments will be dynamically inserted here -->
+            <div id="emptyState" class="text-center py-16">
+              <div class="w-20 h-20 bg-primary-10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="message-square" class="w-10 h-10 text-primary"></i>
+              </div>
+              <h3 class="text-foreground text-xl font-semibold mb-3">Ready to Explore Comments</h3>
+              <p class="text-muted-foreground text-base max-w-2xl mx-auto mb-8">
+                Enter a YouTube URL above to start loading comments. Our tool can handle videos with millions of comments efficiently.
+              </p>
+              <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border text-sm text-muted-foreground">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>
+                YouTube API V3 Ready
+              </div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div id="loadingIndicator" class="hidden flex flex-col items-center justify-center py-16">
+              <div class="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
+              <p class="text-muted-foreground text-base">Loading comments...</p>
+              <p class="text-muted-foreground text-sm mt-2">This might take a moment for videos with many comments</p>
+            </div>
+
+            <!-- Comments list -->
+            <div id="commentsList" class="hidden space-y-4">
+                <!-- Skeleton loading placeholders -->
+                <div id="skeletonLoader" class="space-y-4 hidden">
+                    <div class="border border-border rounded-lg p-4 bg-card mb-4 animate-pulse">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-300"></div>
+                            <div class="flex-1">
+                                <div class="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+                                <div class="h-3 bg-gray-300 rounded w-3/4 mb-1"></div>
+                                <div class="h-3 bg-gray-300 rounded w-2/3 mb-3"></div>
+                                <div class="h-3 bg-gray-300 rounded w-1/5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border border-border rounded-lg p-4 bg-card mb-4 animate-pulse">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-300"></div>
+                            <div class="flex-1">
+                                <div class="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+                                <div class="h-3 bg-gray-300 rounded w-3/4 mb-1"></div>
+                                <div class="h-3 bg-gray-300 rounded w-2/3 mb-3"></div>
+                                <div class="h-3 bg-gray-300 rounded w-1/5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border border-border rounded-lg p-4 bg-card mb-4 animate-pulse">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-300"></div>
+                            <div class="flex-1">
+                                <div class="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+                                <div class="h-3 bg-gray-300 rounded w-3/4 mb-1"></div>
+                                <div class="h-3 bg-gray-300 rounded w-2/3 mb-3"></div>
+                                <div class="h-3 bg-gray-300 rounded w-1/5"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress bar -->
+            <div id="progressBarContainer" class="hidden w-full bg-gray-200 rounded-full h-1 mb-4">
+                <div id="progressBar" class="bg-primary h-1 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            
+            <!-- Load more button -->
+            <div id="loadMoreContainer" class="hidden text-center py-6">
+                <button id="loadMoreBtn" class="inline-flex items-center gap-2 h-10 px-6 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-sm">
+                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                    <span id="loadMoreText">Load More Comments</span>
+                </button>
+            </div>
+            
+            <!-- Auto load toggle -->
+            <div id="autoLoadContainer" class="hidden text-center py-4">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="autoLoadToggle" class="sr-only peer">
+                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    <span class="ms-3 text-sm font-medium text-foreground">Auto Load Comments</span>
+                </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem/Solution Section -->
+    <section class="section-padding bg-background">
+      <div class="container mx-auto px-4 max-w-3xl text-center">
+        <h2 class="text-3xl font-bold text-foreground mb-6">The Problem with Infinite Scroll</h2>
+        <p class="text-muted-foreground mb-8 text-lg">
+          We know that feeling when your browser tab starts lagging, the fan kicks on, and you still can't find the
+          comment you were looking for.
+        </p>
+
+        <div class="bg-secondary/30 rounded-xl p-6 border border-border text-left flex gap-4">
+          <div class="flex-shrink-0">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-yellow-500"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-foreground mb-1">Did you know?</h3>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              YouTube's native comment section can consume up to 1.8GB of RAM when loading 40,000 comments. Our Viewer
+              stays below 650MB throughout the load process.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="section-padding bg-secondary/50 border-y border-border">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-foreground mb-4">Why Our Viewer is the Best</h2>
+          <p class="text-muted-foreground">No lag, full load, beautiful interface.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div class="bg-card rounded-xl border border-border p-6 card-hover">
+            <div class="w-12 h-12 rounded-lg bg-primary-10 flex items-center justify-center mb-4">
+              <i data-lucide="zap" class="w-6 h-6 text-primary"></i>
+            </div>
+            <h3 class="font-semibold text-foreground mb-2">Technical Stability</h3>
+            <p class="text-sm text-muted-foreground">65% less memory usage compared to native YouTube. No more browser
+              crashes.</p>
+          </div>
+          <!-- Feature 2 -->
+          <div class="bg-card rounded-xl border border-border p-6 card-hover">
+            <div class="w-12 h-12 rounded-lg bg-primary-10 flex items-center justify-center mb-4">
+              <i data-lucide="monitor" class="w-6 h-6 text-primary"></i>
+            </div>
+            <h3 class="font-semibold text-foreground mb-2">Comfortable UI/UX</h3>
+            <p class="text-sm text-muted-foreground">Clean, forum-like display with dark mode support and easy
+              readability.</p>
+          </div>
+          <!-- Feature 3 -->
+          <div class="bg-card rounded-xl border border-border p-6 card-hover">
+            <div class="w-12 h-12 rounded-lg bg-primary-10 flex items-center justify-center mb-4">
+              <i data-lucide="users" class="w-6 h-6 text-primary"></i>
+            </div>
+            <h3 class="font-semibold text-foreground mb-2">Expert Endorsed</h3>
+            <p class="text-sm text-muted-foreground">Trusted by community managers handling videos with over a million
+              comments.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Viewer Exclusive Features -->
+    <section class="section-padding bg-background">
+      <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-foreground mb-12 text-center">Viewer Exclusive Features</h2>
+
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div class="flex gap-4">
+            <div
+              class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 text-foreground">
+              <i data-lucide="arrow-up-down" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-1">Advanced Sorting</h3>
+              <p class="text-sm text-muted-foreground">Sort by Oldest First and Most Liked - features essential for
+                historical analysis.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div
+              class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 text-foreground">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-1">Exact Timestamps</h3>
+              <p class="text-sm text-muted-foreground">View exact publish timestamps (UTC) for precise archival
+                research.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div
+              class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 text-foreground">
+              <i data-lucide="thumbs-up" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-1">Engagement Metrics</h3>
+              <p class="text-sm text-muted-foreground">See like counts and reply threads for every comment clearly.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div
+              class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 text-foreground">
+              <i data-lucide="filter" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-1">Date Filtering</h3>
+              <p class="text-sm text-muted-foreground">Filter comments by specific date range for targeted analysis.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Upgrade CTA (Primary Background) -->
+    <section class="section-padding bg-primary-10 border-y border-primary/20">
+      <div class="container mx-auto px-4 text-center max-w-3xl">
+        <h2 class="text-3xl font-bold text-foreground mb-4">But Wait, There's More: Upgrade to Finder</h2>
+        <p class="text-lg text-muted-foreground mb-8">
+          The Viewer is great for reading, but if you need actionable intelligence (AI Sentiment, Keywords, Export), you
+          need the Finder.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/"
+            class="inline-flex items-center gap-2 h-12 px-8 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-sm">
+            <i data-lucide="search" class="w-4 h-4"></i> Try Comment Finder
+          </a>
+          <a href="/ai-analysis"
+            class="inline-flex items-center gap-2 h-12 px-8 rounded-md bg-card text-foreground border border-border font-medium hover:bg-accent transition-colors shadow-sm">
+            <i data-lucide="brain" class="w-4 h-4"></i> View AI Features
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Other Tools Grid -->
+    <section class="section-padding bg-background">
+      <div class="container mx-auto px-4">
+        <h2 class="text-2xl font-bold text-foreground mb-8 text-center">Explore Other Tools</h2>
+        <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <a href="/first-comment" class="bg-card p-6 rounded-xl border border-border card-hover group block">
+            <i data-lucide="clock" class="w-8 h-8 text-primary mb-4"></i>
+            <h3 class="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">Find First Comment
+            </h3>
+            <p class="text-sm text-muted-foreground">Pinpoint the exact time a video's comment section began.</p>
+          </a>
+          <a href="/user-search" class="bg-card p-6 rounded-xl border border-border card-hover group block">
+            <i data-lucide="user" class="w-8 h-8 text-primary mb-4"></i>
+            <h3 class="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">Search by User
+            </h3>
+            <p class="text-sm text-muted-foreground">Find all comments posted by a single user ID.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section-padding bg-secondary/30 border-t border-border">
+      <div class="container mx-auto px-4 max-w-2xl">
+        <h2 class="text-2xl font-bold text-foreground mb-8 text-center">FAQ</h2>
+        <div class="space-y-4">
+          <details class="bg-card rounded-xl border border-border p-4 group">
+            <summary
+              class="font-semibold text-foreground cursor-pointer list-none flex items-center justify-between text-sm">
+              Is the YT Comment Viewer completely free?
+              <i data-lucide="chevron-down"
+                class="w-4 h-4 text-muted-foreground group-open:rotate-180 transition-transform"></i>
+            </summary>
+            <p class="mt-3 text-sm text-muted-foreground leading-relaxed">
+              Yes, the core viewing, sorting, and filtering features are entirely free. We only charge for advanced
+              features like data export and deep AI analysis.
+            </p>
+          </details>
+          <details class="bg-card rounded-xl border border-border p-4 group">
+            <summary
+              class="font-semibold text-foreground cursor-pointer list-none flex items-center justify-between text-sm">
+              Is there a limit on comments I can load?
+              <i data-lucide="chevron-down"
+                class="w-4 h-4 text-muted-foreground group-open:rotate-180 transition-transform"></i>
+            </summary>
+            <p class="mt-3 text-sm text-muted-foreground leading-relaxed">
+              We support loading very large volumes, typically over a million comments, limited only by the YouTube API
+              quota. Our tool handles this volume better than your browser.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-border bg-card">
+    <div class="container mx-auto px-4 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <a href="/" class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
+              <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+            </div>
+            <span class="font-bold text-lg">YT Finder</span>
+          </a>
+          <p class="text-muted-foreground text-sm mb-4">
+            The fastest way to search, analyze, and export YouTube comments.
+          </p>
+          <div class="flex gap-3">
+            <a href="#"
+              class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+              <i data-lucide="twitter" class="w-4 h-4"></i>
+            </a>
+            <a href="#"
+              class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+              <i data-lucide="github" class="w-4 h-4"></i>
+            </a>
+            <a href="#"
+              class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+              <i data-lucide="linkedin" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-foreground mb-4">Product</h3>
+          <ul class="space-y-2 text-sm text-muted-foreground">
+            <li><a href="/" class="hover:text-foreground transition-colors">Search</a></li>
+            <li><a href="/viewer" class="hover:text-foreground transition-colors">Viewer</a></li>
+            <li><a href="/ai-analysis" class="hover:text-foreground transition-colors">AI Analysis</a></li>
+            <li><a href="/export-data" class="hover:text-foreground transition-colors">Export</a></li>
+            <li><a href="/first-comment" class="hover:text-foreground transition-colors">First Comment</a></li>
+            <li><a href="/user-search" class="hover:text-foreground transition-colors">User Search</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-foreground mb-4">Resources</h3>
+          <ul class="space-y-2 text-sm text-muted-foreground">
+            <li><a href="/blog" class="hover:text-foreground transition-colors">Blog</a></li>
+            <li><a href="/docs" class="hover:text-foreground transition-colors">Documentation</a></li>
+            <li><a href="/api" class="hover:text-foreground transition-colors">API</a></li>
+            <li><a href="/support" class="hover:text-foreground transition-colors">Support</a></li>
+            <li><a href="/changelog" class="hover:text-foreground transition-colors">Changelog</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-foreground mb-4">Legal</h3>
+          <ul class="space-y-2 text-sm text-muted-foreground">
+            <li><a href="/privacy" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
+            <li><a href="/terms" class="hover:text-foreground transition-colors">Terms of Service</a></li>
+            <li><a href="/cookies" class="hover:text-foreground transition-colors">Cookie Policy</a></li>
+            <li><a href="/contact" class="hover:text-foreground transition-colors">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
+        <p>© 2025 YT Comment Finder. This site is not affiliated with YouTube or Google.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // Dark Mode Logic
+    const html = document.documentElement;
+    const toggleBtn = document.getElementById("theme-toggle");
+
+    if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      html.classList.add("dark");
+    } else {
+      html.classList.remove("dark");
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      if (html.classList.contains("dark")) {
+        html.classList.remove("dark");
+        localStorage.theme = "light";
+      } else {
+        html.classList.add("dark");
+        localStorage.theme = "dark";
+      }
+    });
+
+    // Initialize Socket.IO connection
+    // Connect to the server running on port 8003
+    const socket = io('http://localhost:8002', {
+      reconnectionDelayMax: 30000,
+      randomizationFactor: 0
+    });
+
+    // Initialize Comment Manager
+    const commentManager = new CommentManager();
+
+    // Add connection event listeners for debugging
+    socket.on('connect', () => {
+      console.log('Socket connected successfully');
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+    });
+
+    // Function to get URL parameters
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      const results = regex.exec(window.location.href);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    // Get video parameter from URL
+    const videoParam = getUrlParameter('video');
+    if (videoParam) {
+      // Display the video ID in the input field
+      document.getElementById("urlInput").value = videoParam;
+
+      // Automatically load the video if a video parameter is present
+      setTimeout(() => {
+        handleLoad();
+      }, 500);
+    }
+
+    // Handle Load Logic
+    function handleLoad() {
+      const urlInput = document.getElementById("urlInput");
+      const btn = document.querySelector('button[onclick="handleLoad()"]');
+      const url = urlInput.value;
+
+      if (url) {
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Loading...`;
+        btn.classList.add('opacity-80', 'cursor-not-allowed');
+        lucide.createIcons();
+
+        // Show loading indicator and hide empty state
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('loadingIndicator').classList.remove('hidden');
+        document.getElementById('commentsList').classList.add('hidden');
+
+        // Extract video ID and emit to backend
+        const videoId = extractVideoId(url);
+        if (videoId) {
+          // Emit the video ID to the backend
+          socket.emit('idSent', videoId);
+        } else {
+          alert("Invalid YouTube URL or video ID");
+          btn.innerHTML = originalContent;
+          btn.classList.remove('opacity-80', 'cursor-not-allowed');
+          lucide.createIcons();
+
+          // Hide loading indicator and show empty state
+          document.getElementById('loadingIndicator').classList.add('hidden');
+          document.getElementById('emptyState').classList.remove('hidden');
+        }
+      } else {
+        urlInput.focus();
+        urlInput.parentElement.classList.add('ring-2', 'ring-primary', 'ring-offset-2', 'ring-offset-background');
+        setTimeout(() => urlInput.parentElement.classList.remove('ring-2', 'ring-primary', 'ring-offset-2', 'ring-offset-background'), 500);
+      }
+    }
+
+    // Add event listener for Enter key press in the URL input field
+    document.getElementById("urlInput").addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleLoad();
+      }
+    });
+
+    // Add event listener for sort select change
+    const sortSelect = document.getElementById("sortSelect");
+    if (sortSelect) {
+      sortSelect.addEventListener("change", function() {
+        const sortOrder = this.value;
+        commentManager.setSort(sortOrder);
+        displayCurrentPageComments();
+        updateCommentCount();
+      });
+    }
+    
+    // Add event listener for search input
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+      searchInput.addEventListener("input", function() {
+        // Debounce search to avoid too many updates
+        clearTimeout(window.searchTimeout);
+        window.searchTimeout = setTimeout(() => {
+          const keywords = this.value.trim();
+          commentManager.setFilters({ keywords });
+          displayCurrentPageComments();
+          updateCommentCount();
+        }, 300);
+      });
+    }
+    
+    // Add event listener for filter button
+    const filterBtn = document.getElementById("filterBtn");
+    if (filterBtn) {
+      filterBtn.addEventListener("click", function() {
+        const filterPanel = document.getElementById("filterPanel");
+        if (filterPanel) {
+          filterPanel.classList.toggle("hidden");
+        }
+      });
+    }
+    
+    // Add event listener for apply filters button
+    const applyFiltersBtn = document.getElementById("applyFiltersBtn");
+    if (applyFiltersBtn) {
+      applyFiltersBtn.addEventListener("click", function() {
+        const minLikesFilter = document.getElementById("minLikesFilter");
+        const startDateFilter = document.getElementById("startDateFilter");
+        const endDateFilter = document.getElementById("endDateFilter");
+        const lengthFilter = document.getElementById("lengthFilter");
+        
+        const minLikes = minLikesFilter ? (parseInt(minLikesFilter.value) || 0) : 0;
+        const startDate = startDateFilter ? startDateFilter.value : "";
+        const endDate = endDateFilter ? endDateFilter.value : "";
+        const length = lengthFilter ? lengthFilter.value : "all";
+        
+        const filters = {
+          minLikes: minLikes,
+          length: length
+        };
+        
+        if (startDate) {
+          filters.startDate = new Date(startDate);
+        }
+        
+        if (endDate) {
+          filters.endDate = new Date(endDate);
+        }
+        
+        commentManager.setFilters(filters);
+        displayCurrentPageComments();
+        updateCommentCount();
+      });
+    }
+    
+    // Add event listener for reset filters button
+    const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+    if (resetFiltersBtn) {
+      resetFiltersBtn.addEventListener("click", function() {
+        const minLikesFilter = document.getElementById("minLikesFilter");
+        const startDateFilter = document.getElementById("startDateFilter");
+        const endDateFilter = document.getElementById("endDateFilter");
+        const lengthFilter = document.getElementById("lengthFilter");
+        const searchInput = document.getElementById("searchInput");
+        
+        if (minLikesFilter) minLikesFilter.value = 0;
+        if (startDateFilter) startDateFilter.value = "";
+        if (endDateFilter) endDateFilter.value = "";
+        if (lengthFilter) lengthFilter.value = "all";
+        
+        commentManager.setFilters({
+          keywords: "",
+          minLikes: 0,
+          startDate: null,
+          endDate: null,
+          length: "all"
+        });
+        
+        // Also clear search input
+        if (searchInput) searchInput.value = "";
+        
+        displayCurrentPageComments();
+        updateCommentCount();
+      });
+    }
+    
+    // Add event listener for load more button
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener("click", function() {
+        loadMoreComments();
+      });
+    }
+    
+    // Fix: Ensure load more button is properly initialized
+    function initLoadMoreButton() {
+      const loadMoreContainer = document.getElementById('loadMoreContainer');
+      const autoLoadContainer = document.getElementById('autoLoadContainer');
+      if (loadMoreContainer && autoLoadContainer) {
+        // Show load more button by default when comments are loaded
+        loadMoreContainer.classList.remove('hidden');
+        autoLoadContainer.classList.remove('hidden');
+      }
+    }
+    
+    // Add event listener for auto load toggle
+    const autoLoadToggle = document.getElementById("autoLoadToggle");
+    if (autoLoadToggle) {
+      autoLoadToggle.addEventListener("change", function() {
+        if (this.checked) {
+          // Start auto loading
+          startAutoLoad();
+        } else {
+          // Stop auto loading
+          stopAutoLoad();
+        }
+      });
+    }
+    
+    // Auto load interval
+    let autoLoadInterval = null;
+    
+    // Function to start auto loading
+    function startAutoLoad() {
+      // Clear any existing interval
+      if (autoLoadInterval) {
+        clearInterval(autoLoadInterval);
+      }
+      
+      // Set up auto loading interval (every 3 seconds)
+      autoLoadInterval = setInterval(() => {
+        const stats = commentManager.getStats();
+        // Check if we have more comments to load
+        if (stats.filteredCount > (commentManager.getCurrentPage() + 1) * commentManager.pageSize ||
+            stats.totalComments > (commentManager.getCurrentPage() + 1) * commentManager.pageSize) {
+          // Load next page
+          if (commentManager.nextPage()) {
+            displayCurrentPageComments();
+            updateCommentCount();
+          } else {
+            // If no more pages in filtered results, try loading more from server
+            loadMoreComments();
+          }
+        } else {
+          // No more comments, stop auto loading
+          stopAutoLoad();
+          const autoLoadToggle = document.getElementById("autoLoadToggle");
+          if (autoLoadToggle) {
+            autoLoadToggle.checked = false;
+          }
+        }
+      }, 3000);
+    }
+    
+    // Function to stop auto loading
+    function stopAutoLoad() {
+      if (autoLoadInterval) {
+        clearInterval(autoLoadInterval);
+        autoLoadInterval = null;
+      }
+    }
+    
+    // Function to load more comments
+    function loadMoreComments() {
+      // Show skeleton loader
+      showSkeletonLoader();
+      
+      // Update button text to show loading state
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      const loadMoreText = document.getElementById("loadMoreText");
+      const originalText = loadMoreText ? loadMoreText.textContent : "Load More Comments";
+      
+      if (loadMoreBtn) {
+        loadMoreBtn.disabled = true;
+      }
+      
+      if (loadMoreText) {
+        loadMoreText.textContent = "Loading...";
+      }
+      
+      // Try to load next page from CommentManager first
+      if (commentManager.nextPage()) {
+        // If we have more comments in memory, display them
+        displayCurrentPageComments();
+        updateCommentCount();
+        
+        // Reset button state
+        if (loadMoreBtn) {
+          loadMoreBtn.disabled = false;
+        }
+        if (loadMoreText) {
+          loadMoreText.textContent = originalText;
+        }
+        hideSkeletonLoader();
+      } else {
+        // If no more comments in memory, load from backend
+        const sortOrder = document.getElementById("sortSelect");
+        const currentCommentCount = commentManager.allComments.length;
+        
+        // Emit event to backend to load more comments
+        socket.emit("showMore", {
+          sort: sortOrder ? sortOrder.value : "dateNewest",
+          commentNum: currentCommentCount,
+          pageSize: 50 // Load 50 comments at a time
+        });
+        
+        // Reset button text after a delay (in case of error)
+        setTimeout(() => {
+          if (loadMoreBtn) {
+            loadMoreBtn.disabled = false;
+          }
+          if (loadMoreText) {
+            loadMoreText.textContent = originalText;
+          }
+          hideSkeletonLoader();
+        }, 10000);
+      }
+    }
+      
+    // Function to load comments with specific sort order
+    function loadCommentsWithSort(sortOrder) {
+      // Show skeleton loader
+      showSkeletonLoader();
+      
+      // Reset comments list
+      const commentsList = document.getElementById('commentsList');
+      if (commentsList) {
+        commentsList.innerHTML = '';
+      }
+      
+      // Emit event to backend to load comments with specific sort order
+      socket.emit("requestSortedComments", {
+        sort: sortOrder,
+        commentNum: 0,
+        pageSize: 50 // Load 50 comments initially
+      });
+    }
+    
+    // Function to display current page comments
+    function displayCurrentPageComments() {
+      const commentsList = document.getElementById('commentsList');
+      const comments = commentManager.getCurrentPageComments();
+      
+      // Check if elements exist before manipulating them
+      if (!commentsList) {
+        console.error('commentsList element not found');
+        return;
+      }
+      
+      // Hide skeleton loader if it exists
+      const skeletonLoader = document.getElementById('skeletonLoader');
+      if (skeletonLoader) {
+        skeletonLoader.classList.add('hidden');
+      }
+      
+      // Clear existing comments when displaying new page or after filter/sort change
+      commentsList.innerHTML = '';
+      
+      if (comments && comments.length > 0) {
+        comments.forEach(comment => {
+          const commentElement = createCommentElement(comment);
+          commentsList.appendChild(commentElement);
+        });
+          
+        // Hide empty state if it exists
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) {
+          emptyState.classList.add('hidden');
+        }
+        commentsList.classList.remove('hidden');
+      } else if (commentManager.getCurrentPage() === 0) {
+        // Show empty state when no comments only on first page
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) {
+          emptyState.classList.remove('hidden');
+        }
+        commentsList.classList.add('hidden');
+      }
+      
+      // Show or hide load more button based on whether there are more comments
+      const loadMoreContainer = document.getElementById('loadMoreContainer');
+      const autoLoadContainer = document.getElementById('autoLoadContainer');
+      const stats = commentManager.getStats();
+      
+      // Always show load more container when comments are loaded
+      if (loadMoreContainer) {
+        loadMoreContainer.classList.remove('hidden');
+      }
+      if (autoLoadContainer) {
+        autoLoadContainer.classList.remove('hidden');
+      }
+      
+      // Check if we have more comments to load
+      const hasMoreFiltered = stats.filteredCount > (commentManager.getCurrentPage() + 1) * commentManager.pageSize;
+      const hasMoreTotal = stats.totalComments > (commentManager.getCurrentPage() + 1) * commentManager.pageSize;
+      
+      // Show load more button if there are more comments available
+      if (hasMoreFiltered || hasMoreTotal) {
+        if (loadMoreContainer) {
+          loadMoreContainer.classList.remove('hidden');
+        }
+      } else {
+        if (loadMoreContainer) {
+          loadMoreContainer.classList.add('hidden');
+        }
+      }
+    }
+      
+    // Function to update comment count display
+    function updateCommentCount() {
+      const stats = commentManager.getStats();
+      const commentCount = document.getElementById('commentCount');
+      
+      // Check if element exists before manipulating it
+      if (commentCount) {
+        commentCount.textContent = `${stats.filteredCount.toLocaleString()} of ${stats.totalComments.toLocaleString()} Comments`;
+      }
+    }
+      
+    // Function to show skeleton loader
+    function showSkeletonLoader() {
+      const skeletonLoader = document.getElementById('skeletonLoader');
+      const commentsList = document.getElementById('commentsList');
+      
+      if (skeletonLoader) {
+        skeletonLoader.classList.remove('hidden');
+      }
+      if (commentsList) {
+        commentsList.classList.remove('hidden');
+      }
+    }
+      
+    // Function to hide skeleton loader
+    function hideSkeletonLoader() {
+      const skeletonLoader = document.getElementById('skeletonLoader');
+      if (skeletonLoader) {
+        skeletonLoader.classList.add('hidden');
+      }
+    }
+      
+    // Function to update progress bar
+    function updateProgressBar(percentage) {
+      const progressBarContainer = document.getElementById('progressBarContainer');
+      const progressBar = document.getElementById('progressBar');
+      
+      if (progressBarContainer && progressBar) {
+        if (percentage > 0 && percentage < 100) {
+          progressBarContainer.classList.remove('hidden');
+          progressBar.style.width = percentage + '%';
+        } else {
+          progressBarContainer.classList.add('hidden');
+        }
+      }
+    }
+    
+    // Reply handling functions
+    function toggleReplies(commentId) {
+      const container = document.getElementById(`repliesContainer-${commentId}`);
+      const icon = document.getElementById(`replyToggleIcon-${commentId}`);
+      const text = document.getElementById(`replyToggleText-${commentId}`);
+      
+      if (container && icon && text) {
+        if (container.classList.contains('hidden')) {
+          container.classList.remove('hidden');
+          icon.classList.add('rotate-180');
+          
+          // If no replies loaded yet, load them
+          if (container.children.length === 0) {
+            loadReplies(commentId);
+          } else {
+            text.innerHTML = text.innerHTML.replace('Show', 'Hide');
+          }
+        } else {
+          container.classList.add('hidden');
+          icon.classList.remove('rotate-180');
+          text.innerHTML = text.innerHTML.replace('Hide', 'Show');
+        }
+      }
+    }
+    
+    function loadReplies(commentId) {
+      const container = document.getElementById(`repliesContainer-${commentId}`);
+      const text = document.getElementById(`replyToggleText-${commentId}`);
+      
+      if (container && text) {
+        text.innerHTML = 'Loading replies...';
+        
+        // Simulate loading replies (replace with actual API call)
+        setTimeout(() => {
+          // This is a placeholder - actual implementation would call the backend
+          container.innerHTML = '<div class="text-center py-4 text-muted-foreground">Reply functionality coming soon</div>';
+          text.innerHTML = text.innerHTML.replace('Loading replies...', 'Hide replies');
+        }, 1000);
+      }
+    }
+    
+    function copyCommentText(commentId) {
+      const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+      if (commentElement) {
+        const textElement = commentElement.querySelector('.text-foreground');
+        if (textElement) {
+          const text = textElement.textContent || textElement.innerText;
+          navigator.clipboard.writeText(text).then(() => {
+            // Show success feedback
+            showNotification('Comment text copied to clipboard', 'success');
+          }).catch(err => {
+            console.error('Failed to copy text: ', err);
+          });
+        }
+      }
+    }
+    
+    // Export comments functionality
+    function exportComments(format) {
+      // Get all comments from CommentManager
+      const commentsToExport = commentManager.filteredComments;
+      
+      if (commentsToExport.length === 0) {
+        showNotification('No comments to export', 'warning');
+        return;
+      }
+      
+      let data, filename, mimeType;
+      
+      if (format === 'json') {
+        // Export as JSON
+        data = JSON.stringify(commentsToExport, null, 2);
+        filename = `youtube-comments-${Date.now()}.json`;
+        mimeType = 'application/json';
+      } else {
+        // Export as CSV
+        data = convertToCSV(commentsToExport);
+        filename = `youtube-comments-${Date.now()}.csv`;
+        mimeType = 'text/csv';
+      }
+      
+      // Create and download the file
+      const blob = new Blob([data], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Show success notification
+      showNotification(`Successfully exported ${commentsToExport.length} comments as ${format.toUpperCase()}`, 'success');
+    }
+    
+    // Convert comments to CSV format
+    function convertToCSV(comments) {
+      // Define CSV headers
+      const headers = ['Comment ID', 'Author', 'Published At', 'Updated At', 'Like Count', 'Reply Count', 'Text'];
+      
+      // Create CSV rows
+      const rows = comments.map(comment => {
+        return [
+          comment.id || '',
+          `"${comment.authorDisplayName || 'Unknown User'}"`,
+          comment.publishedAt || '',
+          comment.updatedAt || '',
+          comment.likeCount || 0,
+          comment.totalReplyCount || comment.replyCount || 0,
+          `"${(comment.textDisplay || '').replace(/"/g, '""')}"`
+        ];
+      });
+      
+      // Combine headers and rows
+      return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+    }
+    
+    // Helper function for notifications
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-success' : type === 'warning' ? 'bg-warning' : 'bg-primary';
+      
+      notification.className = `fixed bottom-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300`;
+      notification.innerHTML = `<i data-lucide="${type === 'success' ? 'check' : type === 'warning' ? 'alert-triangle' : 'info'}" class="w-4 h-4 inline mr-2"></i> ${message}`;
+      
+      document.body.appendChild(notification);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+    
+    // Function to extract YouTube video ID from various URL formats
+    function extractVideoId(url) {
+      // Regular expressions for different YouTube URL formats
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/i,
+        /(?:youtube\.com\/shorts\/)([^&\n?#]+)/i,
+        /(?:youtube\.com\/live\/)([^&\n?#]+)/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+
+      // If no pattern matched, check if the URL is already a video ID
+      if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
+        return url;
+      }
+
+      // Return null if no valid ID could be extracted
+      return null;
+    }
+
+    // Add event listener to request comments after video info is loaded
+    socket.on("videoInfo", ({ videoObject }) => {
+      const btn = document.querySelector('button[onclick="handleLoad()"]');
+      const originalContent = `<i data-lucide="play" class="w-4 h-4"></i> Load Comments`;
+      btn.innerHTML = originalContent;
+      btn.classList.remove('opacity-80', 'cursor-not-allowed');
+      lucide.createIcons();
+
+      if (videoObject !== -1) {
+        // Display video information
+        displayVideoInfo(videoObject);
+
+        // Request all comments after video info is loaded
+        setTimeout(() => {
+          socket.emit("requestAll");
+        }, 100);
+      }
+    });
+
+    // Socket.IO event listeners
+    socket.on("idInvalid", () => {
+      const btn = document.querySelector('button[onclick="handleLoad()"]');
+      const originalContent = `<i data-lucide="play" class="w-4 h-4"></i> Load Comments`;
+      if (btn) {
+        btn.innerHTML = originalContent;
+        btn.classList.remove('opacity-80', 'cursor-not-allowed');
+        lucide.createIcons();
+      }
+      
+      // Hide loading indicator and show empty state
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const emptyState = document.getElementById('emptyState');
+      
+      if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
+      }
+      if (emptyState) {
+        emptyState.classList.remove('hidden');
+      }
+      
+      // Hide skeleton loader
+      hideSkeletonLoader();
+    });
+    
+    socket.on("commentsInfo", ({ num, disabled, max, largeAfterThreshold, graph, error }) => {
+      console.log("Received commentsInfo:", { num, disabled, max, largeAfterThreshold, graph, error });
+      // Update comments information
+      updateCommentsInfo(num, disabled, max, largeAfterThreshold, graph, error);
+    });
+    
+    socket.on("loadStatus", (totalCount) => {
+      console.log("Received loadStatus:", totalCount);
+      // Update loading status
+      updateLoadStatus(totalCount);
+    });
+    
+    socket.on("groupComments", ({ reset, items, showMore, subCount, totalCount, fullStatsData }) => {
+      console.log("Received groupComments:", { reset, items, showMore, subCount, totalCount, fullStatsData });
+      
+      // Hide loading indicator
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
+      }
+      
+      // Store comments in CommentManager
+      if (reset) {
+        // Replace existing comments when reset is true
+        commentManager.setCommentsReplace(items);
+      } else {
+        // Append new comments
+        commentManager.setComments(items);
+      }
+      
+      // Display comments
+      displayCurrentPageComments();
+      updateCommentCount();
+      
+      // Hide skeleton loader
+      hideSkeletonLoader();
+      
+      // Reset load more button state
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      const loadMoreText = document.getElementById("loadMoreText");
+      if (loadMoreBtn) {
+        loadMoreBtn.disabled = false;
+      }
+      if (loadMoreText) {
+        loadMoreText.textContent = "Load More Comments";
+      }
+      
+      // Ensure load more button is visible if there are more comments
+      const stats = commentManager.getStats();
+      const hasMoreComments = stats.filteredCount > (commentManager.getCurrentPage() + 1) * commentManager.pageSize || 
+                             stats.totalComments > (commentManager.getCurrentPage() + 1) * commentManager.pageSize;
+      
+      const loadMoreContainer = document.getElementById('loadMoreContainer');
+      if (loadMoreContainer) {
+        if (hasMoreComments) {
+          loadMoreContainer.classList.remove('hidden');
+        } else {
+          loadMoreContainer.classList.add('hidden');
+        }
+      }
+    });
+    
+    socket.on("quotaExceeded", () => {
+      const btn = document.querySelector('button[onclick="handleLoad()"]');
+      const originalContent = `<i data-lucide="play" class="w-4 h-4"></i> Load Comments`;
+      if (btn) {
+        btn.innerHTML = originalContent;
+        btn.classList.remove('opacity-80', 'cursor-not-allowed');
+        lucide.createIcons();
+      }
+      
+      // Hide loading indicator and show empty state
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const emptyState = document.getElementById('emptyState');
+      
+      if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
+      }
+      if (emptyState) {
+        emptyState.classList.remove('hidden');
+      }
+      
+      // Hide skeleton loader
+      hideSkeletonLoader();
+      
+      // Show quota exceeded message
+      alert("Quota exceeded. Please try again later.");
+    });
+    
+    socket.on("disconnect", () => {
+      // Hide loading indicator and show empty state
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const emptyState = document.getElementById('emptyState');
+      
+      if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
+      }
+      if (emptyState) {
+        emptyState.classList.remove('hidden');
+      }
+      
+      // Hide skeleton loader
+      hideSkeletonLoader();
+      
+      // Show disconnect message
+      alert("Connection lost. Please refresh the page.");
+    });
+
+    // Function to display video information
+    function displayVideoInfo(videoObject) {
+      console.log("Displaying video info:", videoObject);
+
+      // Get video info elements
+      const videoInfo = document.getElementById('videoInfo');
+      const videoThumbnail = document.getElementById('videoThumbnail');
+      const videoTitle = document.getElementById('videoTitle');
+      const viewCount = document.getElementById('viewCount');
+      const likeCount = document.getElementById('likeCount');
+      const commentCountInfo = document.getElementById('commentCountInfo');
+
+      // Set video info
+      if (videoObject.snippet) {
+        if (videoObject.snippet.thumbnails && videoObject.snippet.thumbnails.default) {
+          videoThumbnail.src = videoObject.snippet.thumbnails.default.url;
+        }
+        videoTitle.textContent = videoObject.snippet.title || 'Untitled Video';
+      }
+
+      if (videoObject.statistics) {
+        try {
+          const viewCountValue = parseInt(videoObject.statistics.viewCount) || 0;
+          const likeCountValue = parseInt(videoObject.statistics.likeCount) || 0;
+          const commentCountValue = parseInt(videoObject.statistics.commentCount) || 0;
+
+          viewCount.textContent = `${viewCountValue.toLocaleString()} views`;
+          likeCount.textContent = `${likeCountValue.toLocaleString()} likes`;
+          commentCountInfo.textContent = `${commentCountValue.toLocaleString()} comments`;
+        } catch (e) {
+          console.error("Error formatting video statistics:", e);
+          viewCount.textContent = '0 views';
+          likeCount.textContent = '0 likes';
+          commentCountInfo.textContent = '0 comments';
+        }
+      }
+
+      // Show video info
+      videoInfo.classList.remove('hidden');
+    }
+    
+    // Function to update comment statistics overview
+    function updateCommentStats() {
+      const comments = commentManager.filteredComments;
+      if (comments.length === 0) return;
+      
+      // Calculate statistics
+      const totalComments = comments.length;
+      const totalLikes = comments.reduce((sum, comment) => sum + (parseInt(comment.likeCount) || 0), 0);
+      const avgLikes = totalComments > 0 ? (totalLikes / totalComments).toFixed(1) : 0;
+      const mostLiked = Math.max(...comments.map(comment => parseInt(comment.likeCount) || 0));
+      
+      // Calculate comment density (comments per second since video published)
+      const firstCommentDate = new Date(comments[comments.length - 1]?.publishedAt || Date.now());
+      const lastCommentDate = new Date(comments[0]?.publishedAt || Date.now());
+      const durationSeconds = (lastCommentDate - firstCommentDate) / 1000;
+      const commentDensity = durationSeconds > 0 ? (totalComments / durationSeconds).toFixed(3) : 0;
+      
+      // Update UI elements
+      document.getElementById('totalCommentsStat').textContent = totalComments.toLocaleString();
+      document.getElementById('avgLikeStat').textContent = avgLikes;
+      document.getElementById('mostLikedStat').textContent = mostLiked.toLocaleString();
+      document.getElementById('commentDensityStat').textContent = `${commentDensity} comments/sec`;
+      
+      // Show the stats section
+      document.getElementById('commentStats').classList.remove('hidden');
+    }
+    
+    // Add updateCommentStats calls to relevant functions
+    // Update stats when comments are displayed
+    const originalDisplayCurrentPageComments = displayCurrentPageComments;
+    displayCurrentPageComments = function() {
+      originalDisplayCurrentPageComments.apply(this, arguments);
+      updateCommentStats();
+    };
+
+    // Function to update comments information
+    function updateCommentsInfo(num, disabled, max, largeAfterThreshold, graph, error) {
+      console.log("Comments Info:", { num, disabled, max, largeAfterThreshold, graph, error });
+      // Here you would update the UI with comments information
+    }
+
+    // Function to update loading status
+    function updateLoadStatus(totalCount) {
+      console.log("Load Status:", totalCount);
+      // Here you would update the UI with loading status
+    }
+
+    // Function to display comments
+    /*
+    function displayComments(reset, items, showMore, subCount, totalCount, fullStatsData) {
+      console.log("Displaying comments:", { reset, items, showMore, subCount, totalCount, fullStatsData });
+      
+      // Get DOM elements
+      const emptyState = document.getElementById('emptyState');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const commentsList = document.getElementById('commentsList');
+      const commentCount = document.getElementById('commentCount');
+      const loadMoreContainer = document.getElementById('loadMoreContainer');
+      
+      // Hide loading indicator
+      loadingIndicator.classList.add('hidden');
+      
+      // Show comments list
+      commentsList.classList.remove('hidden');
+      
+      // Update comment count
+      if (totalCount !== undefined) {
+        commentCount.textContent = `${totalCount.toLocaleString()} Comments Total`;
+      } else {
+        commentCount.textContent = `${items.length} Comments Loaded`;
+      }
+      
+      // Clear comments list if reset is true
+      if (reset) {
+        commentsList.innerHTML = '';
+      }
+      
+      // Add new comments to the list
+      if (items && items.length > 0) {
+        items.forEach(comment => {
+          const commentElement = createCommentElement(comment);
+          commentsList.appendChild(commentElement);
+        });
+        
+        // Hide empty state when we have comments
+        emptyState.classList.add('hidden');
+      } else {
+        // Show empty state when no comments
+        emptyState.classList.remove('hidden');
+      }
+      
+      // Show or hide load more button based on whether there are more comments
+      if (showMore) {
+        loadMoreContainer.classList.remove('hidden');
+      } else {
+        loadMoreContainer.classList.add('hidden');
+      }
+      
+      console.log("Finished displaying comments");
+    }
+    */
+
+    // Function to create a comment element
+    function createCommentElement(comment, isReply = false, level = 0) {
+      console.log("Creating comment element for:", comment);
+
+      // Create comment container with appropriate class for nested replies
+      const commentDiv = document.createElement('div');
+      if (isReply) {
+        commentDiv.className = `comment-card ml-${Math.min(level * 4, 16)} pl-${Math.min(level * 2, 8)} border-l-primary/30`;
+      } else {
+        commentDiv.className = 'comment-card';
+      }
+
+      // Handle missing comment data
+      if (!comment) {
+        commentDiv.innerHTML = '<p>Error: Comment data is missing</p>';
+        return commentDiv;
+      }
+
+      // Format published date
+      let publishedDate = 'Unknown date';
+      if (comment.publishedAt) {
+        try {
+          publishedDate = new Date(comment.publishedAt).toLocaleString();
+        } catch (e) {
+          console.error("Error formatting date:", e);
+          publishedDate = 'Invalid date';
+        }
+      }
+
+      // Format like count
+      let likeCount = '0';
+      if (comment.likeCount !== undefined && comment.likeCount !== null) {
+        try {
+          likeCount = parseInt(comment.likeCount).toLocaleString();
+        } catch (e) {
+          console.error("Error formatting like count:", e);
+          likeCount = '0';
+        }
+      }
+
+      // Handle author display name
+      const authorDisplayName = comment.authorDisplayName || 'Unknown User';
+
+      // Handle missing author profile image
+      let authorProfileImageUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(authorDisplayName) + '&background=random';
+      if (comment.authorProfileImageUrl) {
+        authorProfileImageUrl = comment.authorProfileImageUrl;
+      }
+
+      // Handle reply count
+      let replyCount = 0;
+      if (comment.totalReplyCount !== undefined) {
+        replyCount = comment.totalReplyCount;
+      } else if (comment.replyCount !== undefined) {
+        replyCount = comment.replyCount;
+      }
+
+      // Handle text display
+      let textDisplay = 'No content';
+      if (comment.textDisplay) {
+        textDisplay = comment.textDisplay;
+      } else if (comment.snippet && comment.snippet.topLevelComment && comment.snippet.topLevelComment.snippet && comment.snippet.topLevelComment.snippet.textDisplay) {
+        textDisplay = comment.snippet.topLevelComment.snippet.textDisplay;
+      }
+
+      // Add unique ID to comment element for reply handling
+      const commentId = comment.id || `comment-${Math.random().toString(36).substr(2, 9)}`;
+      commentDiv.dataset.commentId = commentId;
+
+      // Create reply handling elements if not a reply itself
+      let replyHandlingHtml = '';
+      if (!isReply && replyCount > 0) {
+        replyHandlingHtml = `
+          <div class="mt-2">
+            <button onclick="toggleReplies('${commentId}')" class="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors">
+              <i data-lucide="chevron-down" class="w-3 h-3" id="replyToggleIcon-${commentId}"></i>
+              <span id="replyToggleText-${commentId}">Show ${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}</span>
+            </button>
+            <div id="repliesContainer-${commentId}" class="mt-2 hidden"></div>
+          </div>
+        `;
+      }
+
+      // Handle highlighted search keywords
+      let highlightedTextDisplay = textDisplay;
+      const currentSearch = document.getElementById('searchInput')?.value.trim();
+      if (currentSearch) {
+        const regex = new RegExp(`(${currentSearch})`, 'gi');
+        highlightedTextDisplay = textDisplay.replace(regex, '<span class="bg-yellow-200 dark:bg-yellow-800 px-1 rounded">$1</span>');
+      }
+
+      commentDiv.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0">
+              <img src="${authorProfileImageUrl}" alt="${authorDisplayName}" class="w-10 h-10 rounded-full" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(authorDisplayName)}&background=random';">
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="font-semibold text-foreground">${authorDisplayName}</span>
+                <span class="text-xs text-muted-foreground">${publishedDate}</span>
+              </div>
+              <div class="text-foreground mb-2">${highlightedTextDisplay}</div>
+              <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                <button onclick="copyCommentText('${commentId}')" class="flex items-center gap-1 hover:text-primary transition-colors">
+                  <i data-lucide="copy" class="w-4 h-4"></i>
+                  <span>Copy</span>
+                </button>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="thumbs-up" class="w-4 h-4"></i>
+                  ${likeCount}
+                </span>
+                ${replyCount > 0 && !isReply ? `
+                <span class="flex items-center gap-1">
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                  ${replyCount}
+                </span>
+                ` : ''}
+              </div>
+              ${replyHandlingHtml}
+            </div>
+          </div>
+        `;
+
+      // Initialize Lucide icons for the new comment
+      try {
+        lucide.createIcons({
+          attrs: {
+            width: '16',
+            height: '16'
+          },
+          nameAttr: 'data-lucide'
+        });
+      } catch (e) {
+        console.error("Error creating Lucide icons:", e);
+      }
+
+      return commentDiv;
+    }
+
+    // Override handleLoad function to show loading indicator
+    function handleLoad() {
+      const urlInput = document.getElementById("urlInput");
+      const btn = document.querySelector('button[onclick="handleLoad()"]');
+      const url = urlInput ? urlInput.value : "";
+
+      if (url) {
+            // Clear previous comments
+            commentManager.clear();
+            
+            if (btn) {
+              const originalContent = btn.innerHTML;
+              btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Loading...`;
+              btn.classList.add('opacity-80', 'cursor-not-allowed');
+              lucide.createIcons();
+            }
+            
+            // Show loading indicator and hide empty state
+            const emptyState = document.getElementById('emptyState');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const commentsList = document.getElementById('commentsList');
+            
+            if (emptyState) {
+              emptyState.classList.add('hidden');
+            }
+            if (loadingIndicator) {
+              loadingIndicator.classList.remove('hidden');
+            }
+            if (commentsList) {
+              commentsList.classList.add('hidden');
+            }
+            
+            // Show skeleton loader for better UX
+            showSkeletonLoader();
+            
+            // Extract video ID and emit to backend
+            const videoId = extractVideoId(url);
+            if (videoId) {
+                // Emit the video ID to the backend
+                socket.emit('idSent', videoId);
+            } else {
+                alert("Invalid YouTube URL or video ID");
+                if (btn) {
+                  btn.innerHTML = originalContent;
+                  btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                  lucide.createIcons();
+                }
+                
+                // Hide loading indicator and show empty state
+                if (loadingIndicator) {
+                  loadingIndicator.classList.add('hidden');
+                }
+                if (emptyState) {
+                  emptyState.classList.remove('hidden');
+                }
+                hideSkeletonLoader();
+            }
+        } else if (urlInput) {
+            urlInput.focus();
+            if (urlInput.parentElement) {
+              urlInput.parentElement.classList.add('ring-2', 'ring-primary', 'ring-offset-2', 'ring-offset-background');
+              setTimeout(() => {
+                if (urlInput.parentElement) {
+                  urlInput.parentElement.classList.remove('ring-2', 'ring-primary', 'ring-offset-2', 'ring-offset-background');
+                }
+              }, 500);
+            }
+        }
+      }
+
+  </script>
+</body>
+
+</html>

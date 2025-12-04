@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>Privacy Policy - YTCommentFinder.com</title>
+    <meta
+      name="description"
+      content="Our official privacy policy, detailing data handling, Google AdSense usage, and commitment to user privacy for YTCommentFinder."
+    />
+    <link rel="canonical" href="https://www.ytcommentfinder.com/privacy">
+
+    <!-- Fonts: Inter (Shadcn Standard) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Inter"', "sans-serif"],
+            },
+            colors: {
+              border: "var(--border)",
+              input: "var(--input)",
+              ring: "var(--ring)",
+              background: "var(--background)",
+              foreground: "var(--foreground)",
+              primary: {
+                DEFAULT: "var(--primary)",
+                foreground: "var(--primary-foreground)",
+                10: "rgba(59, 130, 246, 0.1)",
+              },
+              secondary: {
+                DEFAULT: "var(--secondary)",
+                foreground: "var(--secondary-foreground)",
+              },
+              muted: {
+                DEFAULT: "var(--muted)",
+                foreground: "var(--muted-foreground)",
+              },
+              accent: {
+                DEFAULT: "var(--accent)",
+                foreground: "var(--accent-foreground)",
+              },
+              card: {
+                DEFAULT: "var(--card)",
+                foreground: "var(--card-foreground)",
+              },
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          },
+        },
+      };
+    </script>
+    <style>
+      :root {
+        --background: #ffffff;
+        --foreground: #09090b;
+        --card: #ffffff;
+        --card-foreground: #09090b;
+        --primary: #3b82f6; /* Blue-500 */
+        --primary-start: #3b82f6;
+        --primary-end: #8b5cf6;
+        --primary-foreground: #ffffff;
+        --secondary: #f4f4f5;
+        --secondary-foreground: #18181b;
+        --muted: #f4f4f5;
+        --muted-foreground: #71717a;
+        --accent: #f4f4f5;
+        --accent-foreground: #18181b;
+        --border: #e4e4e7;
+        --input: #e4e4e7;
+        --radius: 0.5rem;
+      }
+
+      .dark {
+        --background: #09090b;
+        --foreground: #fafafa;
+        --card: #09090b;
+        --card-foreground: #fafafa;
+        --primary: #3b82f6;
+        --primary-start: #3b82f6;
+        --primary-end: #8b5cf6;
+        --primary-foreground: #fafafa;
+        --secondary: #27272a;
+        --secondary-foreground: #fafafa;
+        --muted: #27272a;
+        --muted-foreground: #a1a1aa;
+        --accent: #27272a;
+        --accent-foreground: #fafafa;
+        --border: #27272a;
+        --input: #27272a;
+      }
+
+      body {
+        background-color: var(--background);
+        color: var(--foreground);
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      .section-padding {
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+      }
+
+      /* Legal content styling */
+      .legal-content h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        color: var(--foreground);
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 0.5rem;
+      }
+      
+      .legal-content h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 2rem 0 1rem;
+        color: var(--foreground);
+      }
+      
+      .legal-content h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 1.5rem 0 0.75rem;
+        color: var(--foreground);
+      }
+      
+      .legal-content p {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+        color: var(--muted-foreground);
+      }
+      
+      .legal-content ul, .legal-content ol {
+        margin: 1rem 0;
+        padding-left: 1.5rem;
+      }
+      
+      .legal-content li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+      }
+      
+      .legal-content a {
+        color: var(--primary);
+        text-decoration: underline;
+      }
+      
+      .legal-content a:hover {
+        color: var(--primary)/80;
+      }
+      
+      .highlight {
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+        background-size: 200% 200%;
+        animation: gradientBG 5s ease infinite;
+      }
+
+      @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+    </style>
+  </head>
+  <body class="antialiased min-h-screen flex flex-col">
+    
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
+      <div class="container mx-auto px-4 h-16 flex justify-between items-center">
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-2 group">
+          <div class="w-8 h-8 rounded-lg gradient-bg text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+          </div>
+          <span class="font-bold text-lg tracking-tight">YT Finder</span>
+        </a>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
+          <a href="#features" class="hover:text-foreground transition-colors">Features</a>
+          <a href="/first-comment.html" class="hover:text-foreground transition-colors">First Comment</a>
+          <a href="/ai-analysis.html" class="hover:text-foreground transition-colors">AI Analysis</a>
+          <a href="/export-data.html" class="hover:text-foreground transition-colors">Export</a>
+          <a href="/blog/comment-history.html" class="hover:text-foreground transition-colors">Comment History</a>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-4">
+          <button id="theme-toggle" class="p-2 rounded-md hover:bg-muted text-muted-foreground transition-colors">
+            <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+            <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+          </button>
+          
+          <a href="#search" class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium gradient-bg text-white shadow hover:opacity-90 transition-opacity">
+            Get Started
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="flex-grow pt-16">
+      
+      <!-- Hero Section -->
+      <section class="section-padding relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-background pointer-events-none"></div>
+        
+        <div class="container mx-auto px-4 relative max-w-4xl animate-fade-in">
+            <div class="bg-card rounded-xl border border-border p-6 mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                    Privacy Policy
+                </h1>
+                
+                <p class="text-muted-foreground">
+                    Last Updated: November 2025
+                </p>
+            </div>
+        </div>
+      </section>
+
+      <!-- Privacy Policy Content -->
+      <section class="pb-24">
+          <div class="container mx-auto px-4 max-w-4xl">
+              <div class="legal-content bg-card rounded-xl border border-border p-6">
+                  <p>
+                      This Privacy Policy describes how YTCommentFinder.com ("we," "us," or "our") collects, uses, and discloses information when you use our website and services (the "Service").
+                  </p>
+                  
+                  <h2>1. Data We Collect (Non-Personal Information)</h2>
+                  <p>
+                      We prioritize user privacy and <span class="highlight">do not</span> collect Personally Identifiable Information (PII) such as your name or email address, unless voluntarily provided (e.g., when contacting us).
+                  </p>
+                  
+                  <h3>Information Automatically Collected:</h3>
+                  <ul>
+                      <li><strong>Usage Data:</strong> Details about how you use the Service, such as the URLs of YouTube videos/channels searched and the features used (e.g., AI Analysis, Data Export).</li>
+                      <li><strong>Technical Data:</strong> Your browser type, operating system, IP address (used for general geolocation), and device type.</li>
+                      <li><strong>Public YouTube Data:</strong> All data displayed on the Service (comments, user IDs, etc.) are derived exclusively from <span class="highlight">publicly available</span> YouTube API sources.</li>
+                  </ul>
+                  
+                  <h2>2. Third-Party Advertising (Google AdSense Compliance)</h2>
+                  <p>
+                      We use third-party vendors, including Google, to serve ads when you visit our website. This is done to support the operation of our free Service.
+                  </p>
+                  
+                  <ul>
+                      <li><strong>Google AdSense:</strong> Google, as a third-party vendor, uses cookies to serve ads on our site.</li>
+                      <li><strong>DART Cookie:</strong> Google's use of the DART cookie enables it to serve ads to our users based on their visit to our Service and other sites on the Internet.</li>
+                      <li><strong>Opt-Out:</strong> Users may opt out of the use of the DART cookie by visiting the Google Ad and Content Network Privacy Policy: <a href="https://policies.google.com/technologies/ads" target="_blank" rel="nofollow noopener">Google Ads Policy</a>.</li>
+                      <li><strong>Cookies:</strong> These third-party advertisers may use cookies, JavaScript, or web beacons to measure the effectiveness of their advertisements and personalize content. We have no access to or control over these cookies.</li>
+                  </ul>
+                  
+                  <h2>3. Children's Privacy (COPPA Compliance)</h2>
+                  <p>
+                      Our Service is not directed to children under the age of 13. We do not knowingly collect PII from children under 13. If you are a parent or guardian and you learn that your child has provided us with PII, please contact us immediately at <span class="highlight">admin@Ytcommentfinder.com</span>.
+                  </p>
+                  
+                  <h2>4. Links to Third-Party Privacy Policies</h2>
+                  <p>
+                      For compliance and transparency, we provide links to the privacy policies of essential partners:
+                  </p>
+                  
+                  <ul>
+                      <li><strong>Google (General/Analytics/AdSense):</strong> <a href="https://policies.google.com/privacy" target="_blank" rel="nofollow noopener">Google Privacy Policy</a></li>
+                      <li><strong>AI Service Providers:</strong> The privacy policy for our core AI analysis partner is available here: <a href="#" target="_blank" rel="nofollow noopener">AI Partner Policy</a>.</li>
+                  </ul>
+                  
+                  <h2>5. Contact Information</h2>
+                  <p>
+                      If you have any questions about this Privacy Policy, please contact us by email: <span class="highlight">admin@Ytcommentfinder.com</span>
+                  </p>
+              </div>
+          </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border bg-card">
+      <div class="container mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <a href="/" class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
+                <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+              </div>
+              <span class="font-bold text-lg">YT Finder</span>
+            </a>
+            <p class="text-muted-foreground text-sm mb-4">
+              The fastest way to search, analyze, and export YouTube comments.
+            </p>
+            <div class="flex gap-3">
+              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <i data-lucide="twitter" class="w-4 h-4"></i>
+              </a>
+              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <i data-lucide="github" class="w-4 h-4"></i>
+              </a>
+              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <i data-lucide="linkedin" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="font-semibold text-foreground mb-4">Product</h3>
+            <ul class="space-y-2 text-sm text-muted-foreground">
+              <li><a href="/" class="hover:text-foreground transition-colors">Search</a></li>
+              <li><a href="/viewer" class="hover:text-foreground transition-colors">Viewer</a></li>
+              <li><a href="/ai-analysis" class="hover:text-foreground transition-colors">AI Analysis</a></li>
+              <li><a href="/export-data" class="hover:text-foreground transition-colors">Export</a></li>
+              <li><a href="/first-comment" class="hover:text-foreground transition-colors">First Comment</a></li>
+              <li><a href="/user-search" class="hover:text-foreground transition-colors">User Search</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="font-semibold text-foreground mb-4">Resources</h3>
+            <ul class="space-y-2 text-sm text-muted-foreground">
+              <li><a href="/blog" class="hover:text-foreground transition-colors">Blog</a></li>
+              <li><a href="/docs" class="hover:text-foreground transition-colors">Documentation</a></li>
+              <li><a href="/api" class="hover:text-foreground transition-colors">API</a></li>
+              <li><a href="/support" class="hover:text-foreground transition-colors">Support</a></li>
+              <li><a href="/changelog" class="hover:text-foreground transition-colors">Changelog</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="font-semibold text-foreground mb-4">Legal</h3>
+            <ul class="space-y-2 text-sm text-muted-foreground">
+              <li><a href="/privacy" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms" class="hover:text-foreground transition-colors">Terms of Service</a></li>
+              <li><a href="/cookies" class="hover:text-foreground transition-colors">Cookie Policy</a></li>
+              <li><a href="/contact" class="hover:text-foreground transition-colors">Contact Us</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
+          <p>© 2025 YT Comment Finder. This site is not affiliated with YouTube or Google.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      lucide.createIcons();
+
+      // Dark Mode Logic
+      const html = document.documentElement;
+      const toggleBtn = document.getElementById("theme-toggle");
+
+      if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        html.classList.add("dark");
+      } else {
+        html.classList.remove("dark");
+      }
+
+      toggleBtn.addEventListener("click", () => {
+        if (html.classList.contains("dark")) {
+          html.classList.remove("dark");
+          localStorage.theme = "light";
+        } else {
+          html.classList.add("dark");
+          localStorage.theme = "dark";
+        }
+      });
+    </script>
+  </body>
+</html>

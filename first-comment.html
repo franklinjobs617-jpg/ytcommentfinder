@@ -802,7 +802,8 @@
       // ==========================================
       // 3. Socket Logic
       // ==========================================
-      const socket = io("http://localhost:8002", {
+        const socket = io("https://api.ytcommentfinder.com", {
+        path: "/prod-socket/", 
         reconnectionDelayMax: 30000,
         randomizationFactor: 0,
       });

@@ -24,13 +24,18 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N8KJTLNYJ2"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-N8KJTLNYJ2"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-N8KJTLNYJ2');
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-N8KJTLNYJ2");
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -1196,7 +1201,8 @@
       });
 
       // Socket Setup
-      const socket = io("http://localhost:8002", {
+      const socket = io("https://api.ytcommentfinder.com", {
+        path: "/prod-socket/", 
         reconnectionDelayMax: 30000,
         randomizationFactor: 0,
       });

@@ -11,13 +11,10 @@
     />
     <link rel="canonical" href="https://www.ytcommentfinder.com/terms">
 
-    <!-- Fonts: Inter (Shadcn Standard) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -33,13 +30,12 @@
             colors: {
               border: "var(--border)",
               input: "var(--input)",
-              ring: "var(--ring)",
               background: "var(--background)",
               foreground: "var(--foreground)",
               primary: {
                 DEFAULT: "var(--primary)",
                 foreground: "var(--primary-foreground)",
-                10: "rgba(59, 130, 246, 0.1)",
+                glow: "var(--primary-glow)",
               },
               secondary: {
                 DEFAULT: "var(--secondary)",
@@ -49,21 +45,24 @@
                 DEFAULT: "var(--muted)",
                 foreground: "var(--muted-foreground)",
               },
-              accent: {
-                DEFAULT: "var(--accent)",
-                foreground: "var(--accent-foreground)",
-              },
               card: {
                 DEFAULT: "var(--card)",
                 foreground: "var(--card-foreground)",
-              },
+              }
+            },
+            backgroundImage: {
+              'dot-pattern': "radial-gradient(var(--dot-color) 1px, transparent 1px)",
+            },
+            boxShadow: {
+               'glow': '0 0 40px -10px var(--primary-glow)',
+               'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
             },
             animation: {
-              'fade-in': 'fadeIn 0.5s ease-out',
+              'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
             },
             keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               }
             }
@@ -73,294 +72,379 @@
     </script>
     <style>
       :root {
+        /* Light Mode */
         --background: #ffffff;
-        --foreground: #09090b;
-        --card: #ffffff;
-        --card-foreground: #09090b;
-        --primary: #3b82f6; /* Blue-500 */
-        --primary-start: #3b82f6;
-        --primary-end: #8b5cf6;
+        --foreground: #0f172a;
+        
+        --card: rgba(255, 255, 255, 0.7);
+        --card-foreground: #0f172a;
+        
+        --primary: #4f46e5;
         --primary-foreground: #ffffff;
-        --secondary: #f4f4f5;
-        --secondary-foreground: #18181b;
-        --muted: #f4f4f5;
-        --muted-foreground: #71717a;
-        --accent: #f4f4f5;
-        --accent-foreground: #18181b;
-        --border: #e4e4e7;
-        --input: #e4e4e7;
-        --radius: 0.5rem;
+        --primary-glow: rgba(79, 70, 229, 0.3);
+        
+        --secondary: #f8fafc;
+        --secondary-foreground: #0f172a;
+        
+        --muted: #f1f5f9;
+        --muted-foreground: #64748b;
+        
+        --border: #e2e8f0;
+        --input: #f1f5f9;
+        
+        --dot-color: #cbd5e1;
+        --radius: 1rem;
       }
 
       .dark {
+        /* Dark Mode */
         --background: #09090b;
         --foreground: #fafafa;
-        --card: #09090b;
+        
+        --card: rgba(24, 24, 27, 0.6);
         --card-foreground: #fafafa;
-        --primary: #3b82f6;
-        --primary-start: #3b82f6;
-        --primary-end: #8b5cf6;
-        --primary-foreground: #fafafa;
+        
+        --primary: #6366f1;
+        --primary-foreground: #ffffff;
+        --primary-glow: rgba(99, 102, 241, 0.2);
+        
         --secondary: #27272a;
         --secondary-foreground: #fafafa;
-        --muted: #27272a;
+        
+        --muted: #18181b;
         --muted-foreground: #a1a1aa;
-        --accent: #27272a;
-        --accent-foreground: #fafafa;
+        
         --border: #27272a;
-        --input: #27272a;
+        --input: #18181b;
+        
+        --dot-color: #27272a;
       }
 
       body {
         background-color: var(--background);
         color: var(--foreground);
-        transition: background-color 0.3s, color 0.3s;
+        font-family: 'Inter', sans-serif;
       }
 
-      .section-padding {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
+      /* Background Effects */
+      .bg-grid {
+        background-size: 40px 40px;
+        background-image: var(--dot-pattern);
+        mask-image: linear-gradient(to bottom, transparent, 10% black, 80% black, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, transparent, 10% black, 80% black, transparent);
+        opacity: 0.5;
+        position: fixed; inset: 0; z-index: -1;
       }
 
-      /* Legal content styling */
-      .legal-content h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin: 2rem 0 1rem;
-        color: var(--foreground);
-        border-bottom: 2px solid var(--primary);
-        padding-bottom: 0.5rem;
+      .blob-bg {
+        position: fixed;
+        width: 600px; height: 600px;
+        background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+        opacity: 0.12;
+        filter: blur(80px);
+        z-index: -1;
+        pointer-events: none;
       }
-      
+
+      /* Glass Cards */
+      .glass-card {
+        background: var(--card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: var(--radius);
+        box-shadow: var(--glass);
+      }
+      .dark .glass-card {
+        border: 1px solid rgba(255,255,255,0.05);
+      }
+
+      /* Legal Content Typography */
       .legal-content h2 {
         font-size: 1.5rem;
-        font-weight: 600;
-        margin: 2rem 0 1rem;
+        font-weight: 700;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
         color: var(--foreground);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
       }
       
       .legal-content h3 {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        margin: 1.5rem 0 0.75rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
         color: var(--foreground);
       }
       
       .legal-content p {
-        margin-bottom: 1rem;
-        line-height: 1.7;
+        margin-bottom: 1.25rem;
+        line-height: 1.75;
         color: var(--muted-foreground);
       }
       
-      .legal-content ul, .legal-content ol {
-        margin: 1rem 0;
-        padding-left: 1.5rem;
+      .legal-content ul {
+        margin-bottom: 1.5rem;
+        padding-left: 1rem;
       }
       
       .legal-content li {
         margin-bottom: 0.5rem;
         line-height: 1.6;
+        color: var(--muted-foreground);
+        position: relative;
+        padding-left: 1.5rem;
       }
       
-      .legal-content a {
+      .legal-content li::before {
+        content: "•";
         color: var(--primary);
-        text-decoration: underline;
-      }
-      
-      .legal-content a:hover {
-        color: var(--primary)/80;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
       }
       
       .highlight {
-        color: #dc2626; /* Red for important notices */
+        color: var(--foreground);
         font-weight: 600;
+        background: var(--secondary);
+        padding: 0.1rem 0.3rem;
+        border-radius: 0.25rem;
       }
-
-      .gradient-bg {
-        background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-        background-size: 200% 200%;
-        animation: gradientBG 5s ease infinite;
+      
+      /* Warning Box for Refunds */
+      .refund-warning {
+          background: rgba(239, 68, 68, 0.05);
+          border-left: 4px solid #ef4444;
+          padding: 1.5rem;
+          border-radius: 0.5rem;
+          margin: 1.5rem 0;
       }
-
-      @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+      .dark .refund-warning {
+          background: rgba(239, 68, 68, 0.1);
+      }
+      .refund-warning .highlight {
+          color: #ef4444;
+          background: transparent;
+          font-weight: 700;
       }
     </style>
   </head>
-  <body class="antialiased min-h-screen flex flex-col">
-    
+  <body class="antialiased min-h-screen flex flex-col selection:bg-primary/20 selection:text-primary">
+
+    <!-- Backgrounds -->
+    <div class="bg-grid"></div>
+    <div class="blob-bg top-[-10%] left-[-10%]"></div>
+    <div class="blob-bg bottom-[10%] right-[-10%] bg-blue-500/20"></div>
+
     <!-- Navbar -->
-    <nav class="fixed top-0 w-full z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-      <div class="container mx-auto px-4 h-16 flex justify-between items-center">
+    <nav class="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-xl">
+      <div class="container mx-auto px-4 lg:px-6 h-16 flex justify-between items-center">
         <!-- Logo -->
-        <a href="/" class="flex items-center gap-2 group">
-          <div class="w-8 h-8 rounded-lg gradient-bg text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-          </div>
-          <span class="font-bold text-lg tracking-tight">YT Finder</span>
+        <a href="/" class="flex items-center gap-2.5 font-bold text-lg tracking-tight group">
+            <img src="./logo.png" alt="" class="w-44">
         </a>
 
         <!-- Desktop Menu -->
-        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <a href="#features" class="hover:text-foreground transition-colors">Features</a>
-          <a href="/first-comment.html" class="hover:text-foreground transition-colors">First Comment</a>
-          <a href="/ai-analysis.html" class="hover:text-foreground transition-colors">AI Analysis</a>
-          <a href="/export-data.html" class="hover:text-foreground transition-colors">Export</a>
-          <a href="/blog/comment-history.html" class="hover:text-foreground transition-colors">Comment History</a>
+        <div class="hidden md:flex items-center gap-1 bg-secondary/50 p-1 rounded-full border border-white/5">
+            <a href="/" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Home</a>
+            <a href="/first-comment.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">First Comment</a>
+            <a href="/blog/comment-history.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Blog</a>
+            <a href="/ai-analysis.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">AI Analysis</a>
+            <a href="/export-data.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Export</a>
+            <a href="/privacy.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Privacy</a>
+            <a href="/terms.html" class="px-4 py-1.5 text-sm font-medium text-foreground bg-background shadow-sm rounded-full transition-all">Terms</a>
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center gap-4">
-          <button id="theme-toggle" class="p-2 rounded-md hover:bg-muted text-muted-foreground transition-colors">
-            <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
-            <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+        <div class="flex items-center gap-3">
+          <button id="theme-toggle" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary text-muted-foreground transition-colors">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
           </button>
           
-          <a href="#search" class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium gradient-bg text-white shadow hover:opacity-90 transition-opacity">
+          <a href="/index.html" class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-full text-sm font-semibold bg-primary text-white shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all">
             Get Started
           </a>
+
+          <!-- Mobile Menu Button -->
+          <button class="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors" onclick="toggleMobileMenu()">
+              <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
         </div>
+      </div>
+
+      <!-- Mobile Menu Dropdown -->
+      <div id="mobileMenu" class="hidden md:hidden absolute top-16 left-0 w-full bg-background border-b border-border shadow-2xl p-4 flex flex-col gap-2 z-50 animate-fade-in-up">
+          <a href="/" class="px-4 py-3 text-sm font-bold text-primary bg-primary/5 rounded-lg">Search</a>
+          <a href="/first-comment.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">First comment</a>
+          <a href="/blog/comment-history.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Comment History</a>
+          <a href="/ai-analysis.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">AI Analysis</a>
+          <a href="/export-data.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Export</a>
       </div>
     </nav>
 
-    <main class="flex-grow pt-16">
+    <main class="flex-grow pt-24 pb-12">
       
-      <!-- Hero Section -->
-      <section class="section-padding relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-background pointer-events-none"></div>
-        
-        <div class="container mx-auto px-4 relative max-w-4xl animate-fade-in">
-            <div class="bg-card rounded-xl border border-border p-6 mb-8">
-                <h1 class="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                    Terms of Service
-                </h1>
-                
-                <p class="text-muted-foreground">
-                    Last Updated: November 2025
-                </p>
-            </div>
-        </div>
+      <!-- Hero Header -->
+      <section class="container mx-auto px-4 mb-8 text-center animate-fade-in-up">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-6 shadow-glow">
+              <i data-lucide="scale" class="w-8 h-8"></i>
+          </div>
+          <h1 class="text-3xl md:text-5xl font-bold tracking-tight mb-4">Terms of Service</h1>
+          <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Please read these terms carefully before using our platform.
+          </p>
+          <div class="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-xs font-medium text-muted-foreground border border-border">
+              <i data-lucide="clock" class="w-3 h-3"></i> Last Updated: November 2025
+          </div>
       </section>
 
-      <!-- Terms of Service Content -->
-      <section class="pb-24">
-          <div class="container mx-auto px-4 max-w-4xl">
-              <div class="legal-content bg-card rounded-xl border border-border p-6">
-                  <p>
-                      Please read these Terms of Service ("Terms") carefully before using the YTCommentFinder.com website and services. By accessing or using the Service, you agree to be bound by these Terms.
+      <!-- Content -->
+      <section class="container mx-auto px-4 max-w-3xl animate-fade-in-up" style="animation-delay: 0.1s;">
+          <div class="legal-content glass-card p-8 md:p-10">
+              <p class="text-lg leading-relaxed border-b border-border/50 pb-6 mb-6">
+                  Please read these Terms of Service ("Terms") carefully before using the YTCommentFinder.com website and services. By accessing or using the Service, you agree to be bound by these Terms.
+              </p>
+              
+              <h2>
+                  <div class="p-1.5 rounded-md bg-red-500/10 text-red-600"><i data-lucide="ban" class="w-5 h-5"></i></div>
+                  1. Usage Restrictions
+              </h2>
+              <p>
+                  You agree not to use the Service for any purpose that is prohibited by these Terms or by law. Specifically, you agree not to:
+              </p>
+              <ul>
+                  <li><span class="highlight">Mass Scraping/Abuse:</span> Use automated systems or software (other than the tools explicitly provided by our paid Service) to extract large volumes of data.</li>
+                  <li><strong>Illegal Content:</strong> Process any content that is illegal, defamatory, or promotes illegal activity.</li>
+                  <li><strong>Security Violations:</strong> Attempt to interfere with the proper functioning of the Service.</li>
+              </ul>
+              
+              <div class="my-8 border-b border-border/50"></div>
+
+              <h2>
+                  <div class="p-1.5 rounded-md bg-blue-500/10 text-blue-600"><i data-lucide="copyright" class="w-5 h-5"></i></div>
+                  2. Intellectual Property (IP)
+              </h2>
+              <p>
+                  The Service provides access to <span class="highlight">publicly available</span> YouTube comment data.
+              </p>
+              <p>
+                  You, the user, are solely responsible for ensuring you have the legal right to use, download, store, and analyze any data collected or exported through the Service, in accordance with YouTube's Terms of Service and applicable copyright laws. We assume no liability for your misuse of the public data.
+              </p>
+
+              <div class="my-8 border-b border-border/50"></div>
+              
+              <h2>
+                  <div class="p-1.5 rounded-md bg-green-500/10 text-green-600"><i data-lucide="credit-card" class="w-5 h-5"></i></div>
+                  3. Paid Services & Refunds
+              </h2>
+              <p>
+                  Access to premium features such as <span class="highlight">AI Sentiment Analysis</span> and Bulk Data Export requires a paid subscription.
+              </p>
+              
+              <!-- Refund Warning Box -->
+              <div class="refund-warning">
+                  <h3 style="margin-top: 0; color: #ef4444; display: flex; items-center: gap-2;">
+                      <i data-lucide="alert-triangle" class="w-5 h-5"></i> Refund Policy
+                  </h3>
+                  <p style="margin-bottom: 0;">
+                      Due to the immediate, non-returnable, and digital nature of the services provided (including the consumption of processing power for AI analysis and data export): <br><br>
+                      <span class="highlight">All purchases of subscriptions, usage credits, or paid features are final and non-refundable.</span> <br><br>
+                      We do not offer refunds, partial refunds, or exchanges once a payment has been processed, except where required by law.
                   </p>
-                  
-                  <h2>1. Usage Restrictions (Prohibited Behavior)</h2>
-                  <p>
-                      You agree not to use the Service for any purpose that is prohibited by these Terms or by law. Specifically, you agree not to:
-                  </p>
-                  
-                  <ul>
-                      <li><span class="highlight">Mass Scraping/Abuse:</span> Use automated systems or software (other than the tools explicitly provided by our paid Service) to extract large volumes of data.</li>
-                      <li>Illegal Content: Process any content that is illegal, defamatory, or promotes illegal activity.</li>
-                      <li>Security Violations: Attempt to interfere with the proper functioning of the Service.</li>
-                  </ul>
-                  
-                  <h2>2. Intellectual Property (IP) Clause and User Responsibility</h2>
-                  <p>
-                      The Service provides access to <span class="highlight">publicly available</span> YouTube comment data.
-                  </p>
-                  <p>
-                      You, the user, are solely responsible for ensuring you have the legal right to use, download, store, and analyze any data collected or exported through the Service, in accordance with YouTube's Terms of Service and applicable copyright laws. We assume no liability for your misuse of the public data.
-                  </p>
-                  
-                  <h2>3. Paid Services, Subscriptions, and Refund Policy</h2>
-                  <p>
-                      Access to premium features such as <span class="highlight">AI Sentiment Analysis</span> and Bulk Data Export requires a paid subscription.
-                  </p>
-                  
-                  <h3>Refund Policy:</h3>
-                  <p>
-                      Due to the immediate, non-returnable, and digital nature of the services provided (including the consumption of processing power for AI analysis and data export): <span class="highlight">All purchases of subscriptions, usage credits, or paid features are final and non-refundable.</span> We do not offer refunds, partial refunds, or exchanges once a payment has been processed, except where required by law.
-                  </p>
-                  
-                  <h2>4. Disclaimer of Warranties and Limitation of Liability</h2>
-                  <p>
-                      The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We make no warranties regarding the accuracy or reliability of the Service or the data provided. Your use of the Service is at your sole risk.
-                  </p>
-                  <p>
-                      In no event shall YTCommentFinder.com be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits or data, resulting from your use of the Service.
-                  </p>
-                  
-                  <h2>5. Contact Information</h2>
-                  <p>
-                      If you have any questions about these Terms, please contact us by email: <span class="highlight">admin@Ytcommentfinder.com</span>
-                  </p>
+              </div>
+
+              <div class="my-8 border-b border-border/50"></div>
+              
+              <h2>
+                  <div class="p-1.5 rounded-md bg-orange-500/10 text-orange-600"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
+                  4. Disclaimer
+              </h2>
+              <p>
+                  The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We make no warranties regarding the accuracy or reliability of the Service or the data provided. Your use of the Service is at your sole risk.
+              </p>
+              <p>
+                  In no event shall YTCommentFinder.com be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits or data, resulting from your use of the Service.
+              </p>
+
+              <div class="my-8 border-b border-border/50"></div>
+              
+              <h2>
+                  <div class="p-1.5 rounded-md bg-purple-500/10 text-purple-600"><i data-lucide="mail" class="w-5 h-5"></i></div>
+                  5. Contact Information
+              </h2>
+              <p>
+                  If you have any questions about these Terms, please contact us by email:
+              </p>
+              <div class="p-4 bg-secondary rounded-lg border border-border inline-block">
+                  <i data-lucide="at-sign" class="w-4 h-4 inline mr-2 text-primary"></i>
+                  <span class="font-bold text-foreground">support@Ytcommentfinder.com</span>
               </div>
           </div>
       </section>
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-border bg-card">
-      <div class="container mx-auto px-4 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <a href="/" class="flex items-center gap-2 mb-4">
-              <div class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-                <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+    <footer class="border-t border-border/50 bg-background/50 py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-12">
+          <div class="col-span-1 md:col-span-2">
+            <a href="/" class="flex items-center gap-2 mb-6 font-bold text-xl">
+              <div class="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center">
+                 <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
               </div>
-              <span class="font-bold text-lg">YT Finder</span>
+              YT Finder
             </a>
-            <p class="text-muted-foreground text-sm mb-4">
-              The fastest way to search, analyze, and export YouTube comments.
+            <p class="text-sm text-muted-foreground leading-relaxed max-w-sm mb-6">
+              The professional standard for YouTube comment analysis and data extraction. Built for creators, marketers, and data analysts.
             </p>
-            <div class="flex gap-3">
-              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <i data-lucide="twitter" class="w-4 h-4"></i>
-              </a>
-              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <i data-lucide="github" class="w-4 h-4"></i>
-              </a>
-              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <i data-lucide="linkedin" class="w-4 h-4"></i>
-              </a>
+            <div class="flex gap-4">
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
             </div>
           </div>
           
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Product</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/" class="hover:text-foreground transition-colors">Search</a></li>
-              <li><a href="/viewer" class="hover:text-foreground transition-colors">Viewer</a></li>
-              <li><a href="/ai-analysis" class="hover:text-foreground transition-colors">AI Analysis</a></li>
-              <li><a href="/export-data" class="hover:text-foreground transition-colors">Export</a></li>
-              <li><a href="/first-comment" class="hover:text-foreground transition-colors">First Comment</a></li>
-              <li><a href="/user-search" class="hover:text-foreground transition-colors">User Search</a></li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Product</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/" class="hover:text-primary transition-colors">Search</a></li>
+              <li><a href="/ai-analysis.html" class="hover:text-primary transition-colors">AI Analysis</a></li>
+              <li><a href="/export-data.html" class="hover:text-primary transition-colors">Export</a></li>
+              <li><a href="/ai-analysis.html" class="hover:text-primary transition-colors">AI Analysis</a></li>
+              <li><a href="/first-comment.html" class="hover:text-primary transition-colors">First Comment</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Resources</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/blog" class="hover:text-foreground transition-colors">Blog</a></li>
-              <li><a href="/docs" class="hover:text-foreground transition-colors">Documentation</a></li>
-              <li><a href="/api" class="hover:text-foreground transition-colors">API</a></li>
-              <li><a href="/support" class="hover:text-foreground transition-colors">Support</a></li>
-              <li><a href="/changelog" class="hover:text-foreground transition-colors">Changelog</a></li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Resources</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/blog/comment-history.html" class="hover:text-primary transition-colors">Blog</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Legal</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/privacy" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
-              <li><a href="/terms" class="hover:text-foreground transition-colors">Terms of Service</a></li>
-              <li><a href="/cookies" class="hover:text-foreground transition-colors">Cookie Policy</a></li>
-              <li><a href="/contact" class="hover:text-foreground transition-colors">Contact Us</a></li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Legal</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/privacy.html" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms.html" class="hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><a href="/about.html" class="hover:text-primary transition-colors">About Us</a></li>
             </ul>
           </div>
         </div>
         
-        <div class="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>© 2025 YT Comment Finder. This site is not affiliated with YouTube or Google.</p>
+        <div class="pt-8 border-t border-border/50 mt-12 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+          <p>© 2025 YT Comment Finder. All rights reserved.</p>
+          <div class="flex items-center gap-6 mt-4 md:mt-0">
+             <p>Not affiliated with Google LLC.</p>
+             <div class="flex items-center gap-2">
+                 <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                 <span>All Systems Normal</span>
+             </div>
+          </div>
         </div>
       </div>
     </footer>

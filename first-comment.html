@@ -3,16 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="upgrade-insecure-requests"
-    />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Find First YouTube Comment Instantly | YT Comment Finder</title>
     <meta
       name="description"
       content="Instantly find the very first comment on any YouTube video. Perfect for settling bets with friends or verifying viral claims. 100% free to use."
     />
-    <link rel="canonical" href="https://ytcommentfinder.com/first-comment" />
+    <link rel="canonical" href="https://www.ytcommentfinder.com/first-comment" />
 
     <!-- SEO: Structured Data -->
     <script type="application/ld+json">
@@ -20,8 +17,8 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "YT Comment Finder - First Comment Tool",
-        "description": "Instantly find the very first comment on any YouTube video. Perfect for settling bets with friends or verifying viral claims.",
-        "url": "https://ytcommentfinder.com/first-comment",
+        "description": "Instantly find the very first comment on any YouTube video.",
+        "url": "https://www.ytcommentfinder.com/first-comment",
         "applicationCategory": "UtilityApplication",
         "operatingSystem": "Any",
         "offers": {
@@ -32,21 +29,15 @@
       }
     </script>
 
-    <!-- Fonts: Inter for modern UI -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS & Lucide Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Add Socket.IO client library from CDN -->
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
-    <!-- Custom Config -->
     <script>
       tailwind.config = {
         darkMode: "class",
@@ -58,26 +49,16 @@
             colors: {
               border: "var(--border)",
               input: "var(--input)",
-              ring: "var(--ring)",
               background: "var(--background)",
               foreground: "var(--foreground)",
               primary: {
-                start: "var(--primary-start)",
-                end: "var(--primary-end)",
                 DEFAULT: "var(--primary)",
                 foreground: "var(--primary-foreground)",
+                glow: "var(--primary-glow)",
               },
               secondary: {
-                start: "var(--secondary-start)",
-                end: "var(--secondary-end)",
                 DEFAULT: "var(--secondary)",
                 foreground: "var(--secondary-foreground)",
-              },
-              accent: {
-                start: "var(--accent-start)",
-                end: "var(--accent-end)",
-                DEFAULT: "var(--accent)",
-                foreground: "var(--accent-foreground)",
               },
               muted: {
                 DEFAULT: "var(--muted)",
@@ -86,1184 +67,537 @@
               card: {
                 DEFAULT: "var(--card)",
                 foreground: "var(--card-foreground)",
-              },
-              success: "var(--success)",
-              warning: "var(--warning)",
-              error: "var(--error)",
+              }
+            },
+            backgroundImage: {
+              'dot-pattern': "radial-gradient(var(--dot-color) 1px, transparent 1px)",
+            },
+            boxShadow: {
+               'glow': '0 0 40px -10px var(--primary-glow)',
+               'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
             },
             animation: {
-              "fade-in": "fadeIn 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both",
-              "fade-in-up":
-                "fadeInUp 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both",
-              "pulse-glow":
-                "pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-              float: "float 6s ease-in-out infinite",
-              "gradient-x": "gradientX 3s ease infinite",
+              'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
-              fadeIn: {
-                "0%": { opacity: "0", transform: "translateY(15px)" },
-                "100%": { opacity: "1", transform: "translateY(0)" },
-              },
               fadeInUp: {
-                "0%": { opacity: "0", transform: "translateY(30px)" },
-                "100%": { opacity: "1", transform: "translateY(0)" },
-              },
-              pulseGlow: {
-                "0%, 100%": {
-                  opacity: "1",
-                  boxShadow: "0 0 0 0px rgba(59, 130, 246, 0.4)",
-                },
-                "50%": {
-                  opacity: "1",
-                  boxShadow: "0 0 0 10px rgba(59, 130, 246, 0)",
-                },
-              },
-              float: {
-                "0%, 100%": { transform: "translateY(0)" },
-                "50%": { transform: "translateY(-12px)" },
-              },
-              gradientX: {
-                "0%, 100%": {
-                  "background-size": "200% 200%",
-                  "background-position": "left center",
-                },
-                "50%": {
-                  "background-size": "200% 200%",
-                  "background-position": "right center",
-                },
-              },
-              scaleBounce: {
-                "0%": { transform: "scale(1)" },
-                "50%": { transform: "scale(1.2)" },
-                "100%": { transform: "scale(1)" },
-              },
-            },
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
           },
         },
       };
     </script>
-
     <style>
       :root {
+        /* Light Mode */
         --background: #ffffff;
-        --foreground: #09090b;
-        --card: #ffffff;
-        --card-foreground: #09090b;
-        --popover: #ffffff;
-        --popover-foreground: #09090b;
-        --primary: #3b82f6;
-        --primary-start: #3b82f6;
-        --primary-end: #8b5cf6;
+        --foreground: #0f172a;
+        
+        --card: rgba(255, 255, 255, 0.7);
+        --card-foreground: #0f172a;
+        
+        --primary: #4f46e5;
         --primary-foreground: #ffffff;
-        --secondary: #f4f4f5;
-        --secondary-start: #06b6d4;
-        --secondary-end: #0ea5e9;
-        --secondary-foreground: #18181b;
-        --muted: #f4f4f5;
-        --muted-foreground: #71717a;
-        --accent: #f4f4f5;
-        --accent-start: #f59e0b;
-        --accent-end: #f97316;
-        --accent-foreground: #18181b;
-        --destructive: #ef4444;
-        --destructive-foreground: #fafafa;
-        --border: #e4e4e7;
-        --input: #e4e4e7;
-        --ring: #3b82f6;
-        --radius: 0.75rem;
-        --success: #10b981;
-        --warning: #f59e0b;
-        --error: #ef4444;
+        --primary-glow: rgba(79, 70, 229, 0.3);
+        
+        --secondary: #f8fafc;
+        --secondary-foreground: #0f172a;
+        
+        --muted: #f1f5f9;
+        --muted-foreground: #64748b;
+        
+        --border: #e2e8f0;
+        --input: #f1f5f9;
+        
+        --dot-color: #cbd5e1;
+        --radius: 1rem;
       }
 
       .dark {
+        /* Dark Mode */
         --background: #09090b;
         --foreground: #fafafa;
-        --card: #18181b;
+        
+        --card: rgba(24, 24, 27, 0.6);
         --card-foreground: #fafafa;
-        --popover: #09090b;
-        --popover-foreground: #fafafa;
-        --primary: #3b82f6;
-        --primary-start: #3b82f6;
-        --primary-end: #8b5cf6;
-        --primary-foreground: #fafafa;
+        
+        --primary: #6366f1;
+        --primary-foreground: #ffffff;
+        --primary-glow: rgba(99, 102, 241, 0.2);
+        
         --secondary: #27272a;
-        --secondary-start: #06b6d4;
-        --secondary-end: #0ea5e9;
         --secondary-foreground: #fafafa;
-        --muted: #27272a;
+        
+        --muted: #18181b;
         --muted-foreground: #a1a1aa;
-        --accent: #27272a;
-        --accent-start: #f59e0b;
-        --accent-end: #f97316;
-        --accent-foreground: #fafafa;
-        --destructive: #7f1d1d;
-        --destructive-foreground: #fafafa;
+        
         --border: #27272a;
-        --input: #27272a;
-        --ring: #3b82f6;
-        --success: #10b981;
-        --warning: #f59e0b;
-        --error: #ef4444;
+        --input: #18181b;
+        
+        --dot-color: #27272a;
       }
 
       body {
         background-color: var(--background);
         color: var(--foreground);
-        transition: background-color 0.3s, color 0.3s;
-        font-family: "Inter", sans-serif;
-        overflow-x: hidden;
+        font-family: 'Inter', sans-serif;
       }
 
-      /* 样式复刻 tsx */
-      .section-padding {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
+      /* Background Effects */
+      .bg-grid {
+        background-size: 40px 40px;
+        background-image: var(--dot-pattern);
+        mask-image: linear-gradient(to bottom, transparent, 10% black, 80% black, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, transparent, 10% black, 80% black, transparent);
+        opacity: 0.5;
+        position: fixed; inset: 0; z-index: -1;
       }
 
-      .card-hover {
-        transition: all 0.3s ease;
-      }
-      .card-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
-      }
-      .dark .card-hover:hover {
-        box-shadow: 0 4px 12px -2px rgba(255, 255, 255, 0.05);
-      }
-
-      .pulse-glow:hover {
-        animation: pulseGlow 2s infinite;
-      }
-
-      /* Gradient enhancements */
-      .gradient-text {
-        background: linear-gradient(
-          135deg,
-          var(--primary-start),
-          var(--primary-end)
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        background-size: 200% auto;
-        animation: gradientText 3s linear infinite;
-      }
-
-      .gradient-bg {
-        background: linear-gradient(
-          135deg,
-          var(--primary-start),
-          var(--primary-end)
-        );
-        background-size: 200% 200%;
-        animation: gradientBG 5s ease infinite;
-      }
-
-      .secondary-gradient-bg {
-        background: linear-gradient(
-          135deg,
-          var(--secondary-start),
-          var(--secondary-end)
-        );
-        background-size: 200% 200%;
-        animation: gradientBG 6s ease infinite;
-      }
-
-      .accent-gradient-bg {
-        background: linear-gradient(
-          135deg,
-          var(--accent-start),
-          var(--accent-end)
-        );
-        background-size: 200% 200%;
-        animation: gradientBG 7s ease infinite;
-      }
-
-      @keyframes gradientText {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-
-      @keyframes gradientBG {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-
-      .gradient-border {
-        position: relative;
-        border-radius: var(--radius);
-      }
-
-      .gradient-border::before {
-        content: "";
-        position: absolute;
-        top: -1px;
-        left: -1px;
-        right: -1px;
-        bottom: -1px;
-        background: linear-gradient(
-          135deg,
-          var(--primary-start),
-          var(--primary-end)
-        );
-        border-radius: calc(var(--radius) + 1px);
-        z-index: -1;
-        opacity: 0.2;
-      }
-
-      /* [新增] Toast Notification Style */
-      #toast-container {
+      .blob-bg {
         position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 100;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        width: 600px; height: 600px;
+        background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+        opacity: 0.12;
+        filter: blur(80px);
+        z-index: -1;
         pointer-events: none;
       }
 
-      .toast {
+      /* Glass Cards */
+      .glass-card {
         background: var(--card);
-        color: var(--foreground);
-        border: 1px solid var(--border);
-        padding: 12px 16px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: var(--radius);
+        box-shadow: var(--glass);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .dark .glass-card {
+        border: 1px solid rgba(255,255,255,0.05);
+      }
+      .glass-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px -10px rgba(0,0,0,0.1);
+      }
+
+      /* Toast Notification */
+      #toast-container {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: none;
+        width: max-content;
+        max-width: 90vw;
+      }
+      .toast {
+        background: var(--foreground);
+        color: var(--background);
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideUpFade 0.3s forwards;
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        pointer-events: auto;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.3s ease;
       }
-
-      .toast.show {
-        opacity: 1;
-        transform: translateY(0);
+      @keyframes slideUpFade {
+        to { opacity: 1; transform: translateY(0); }
       }
-
-      .toast-success {
-        border-left: 4px solid var(--success);
-      }
-      .toast-error {
-        border-left: 4px solid var(--error);
-      }
-
-      /* Animated background elements */
-      .animated-bg {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        overflow: hidden;
-        z-index: -1;
-      }
-
-      .animated-bg .shape {
-        position: absolute;
-        opacity: 0.07;
-        border-radius: 50%;
-        filter: blur(20px);
-        animation-duration: 8s;
-        animation-timing-function: ease-in-out;
-        animation-iteration-count: infinite;
-      }
-
-      .shape-1 {
-        width: 350px;
-        height: 350px;
-        background: linear-gradient(
-          135deg,
-          var(--primary-start),
-          var(--primary-end)
-        );
-        top: 5%;
-        left: 2%;
-        animation-name: float, pulse;
-      }
-
-      .shape-2 {
-        width: 250px;
-        height: 250px;
-        background: linear-gradient(
-          135deg,
-          var(--secondary-start),
-          var(--secondary-end)
-        );
-        bottom: 10%;
-        right: 5%;
-        animation-name: floatReverse, pulse;
-        animation-delay: 1s;
-      }
-
-      .shape-3 {
-        width: 200px;
-        height: 200px;
-        background: linear-gradient(
-          135deg,
-          var(--accent-start),
-          var(--accent-end)
-        );
-        top: 35%;
-        right: 15%;
-        animation-name: float, pulse;
-        animation-delay: 2s;
-      }
-
-      .shape-4 {
-        width: 180px;
-        height: 180px;
-        background: linear-gradient(135deg, var(--warning), var(--error));
-        top: 60%;
-        left: 10%;
-        animation-name: floatReverse, pulse;
-        animation-delay: 3s;
-      }
-
-      @keyframes floatReverse {
-        0%,
-        100% {
-          transform: translateY(0) translateX(0);
-        }
-        50% {
-          transform: translateY(-20px) translateX(10px);
-        }
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 0.07;
-          transform: scale(1);
-        }
-        50% {
-          opacity: 0.12;
-          transform: scale(1.1);
-        }
-      }
-
-      /* Enhanced card styles - 更加简洁的效果 */
-      .feature-card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 1.75rem;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transform: translateY(0);
-      }
-
-      .feature-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(
-          90deg,
-          var(--primary-start),
-          var(--primary-end)
-        );
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.4s ease;
-      }
-
-      .feature-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
-      }
-
-      .feature-card:hover::before {
-        transform: scaleX(1);
-      }
-
-      .dark .feature-card {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-
-      .dark .feature-card:hover {
-        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.3);
-      }
-
-      /* Shake animation for errors */
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        10%,
-        30%,
-        50%,
-        70%,
-        90% {
-          transform: translateX(-5px);
-        }
-        20%,
-        40%,
-        60%,
-        80% {
-          transform: translateX(5px);
-        }
-      }
-
-      .animate-shake {
-        animation: shake 0.5s ease-in-out;
-      }
-
-      /* 工具网格卡片样式 */
-      .tool-card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 1.75rem;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transform: translateY(0);
-      }
-
-      .tool-card::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          120deg,
-          transparent,
-          rgba(255, 255, 255, 0.1),
-          transparent
-        );
-        transform: translateX(-100%);
-        transition: transform 0.6s ease;
-      }
-
-      .tool-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
-      }
-
-      .tool-card:hover::after {
-        transform: translateX(100%);
-      }
-
-      .dark .tool-card {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-
-      .dark .tool-card:hover {
-        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.3);
-      }
-
-      /* Image Placeholder for Assets */
-      .img-placeholder {
-        width: 100%;
-        height: 100%;
-        min-height: 200px;
-        background-color: var(--muted);
-        border: 2px dashed var(--border);
-        border-radius: var(--radius);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: var(--muted-foreground);
-        font-size: 0.8rem;
-        position: relative;
-        overflow: hidden;
-      }
-      .img-placeholder img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      /* 斜角卡片 */
-      .skewed-card {
-        transform: skewX(-5deg);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-      }
-
-      .skewed-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.2),
-          transparent
-        );
-        transition: 0.5s;
-        z-index: 1;
-      }
-
-      .skewed-card:hover::before {
-        left: 100%;
-      }
-
-      .skewed-card:hover {
-        transform: skewX(-5deg) translateY(-8px) scale(1.02);
-        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.2);
-      }
-
-      .skewed-card-content {
-        transform: skewX(5deg);
-        position: relative;
-        z-index: 2;
-      }
-
-      /* 视差背景效果 */
-      .parallax-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-attachment: fixed;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        z-index: -1;
-        opacity: 0.1;
-        animation: parallaxFloat 15s ease-in-out infinite alternate;
-      }
-
-      @keyframes parallaxFloat {
-        0% {
-          transform: translate(0, 0) scale(1);
-        }
-        50% {
-          transform: translate(2px, 2px) scale(1.02);
-        }
-        100% {
-          transform: translate(0, 0) scale(1);
-        }
-      }
-
-      @keyframes scaleBounce {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-
-      /* 分割线装饰 */
-      .divider {
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--primary-start),
-          transparent
-        );
-        margin: 3rem 0;
-      }
-
-      /* Tutorial Step Styling */
-      .step-card {
-        margin-bottom: 2rem;
-        border: 1px solid var(--border);
-        padding: 1.5rem;
-        border-radius: var(--radius);
-        background-color: var(--card);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-      }
-
-      .step-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      }
-
-      .pro-tip {
-        border-left: 5px solid transparent;
-        border-image: linear-gradient(
-            to bottom,
-            var(--primary-start),
-            var(--primary-end)
-          )
-          1;
-        background: linear-gradient(
-          to right,
-          rgba(59, 130, 246, 0.05),
-          transparent
-        );
-        padding: 1.5rem;
-        margin: 2rem 0;
-        border-radius: 0 var(--radius) var(--radius) 0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      }
-
-      .dark .pro-tip {
-        background: linear-gradient(
-          to right,
-          rgba(59, 130, 246, 0.1),
-          transparent
-        );
+      
+      .gradient-text {
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        background-image: linear-gradient(to right, var(--primary), #a855f7);
       }
     </style>
   </head>
-  <body class="antialiased min-h-screen flex flex-col">
-    <!-- [新增] Toast Container -->
+  <body class="antialiased min-h-screen flex flex-col selection:bg-primary/20 selection:text-primary">
+
+    <!-- Backgrounds -->
+    <div class="bg-grid"></div>
+    <div class="blob-bg top-[-10%] right-[-10%]"></div>
+    <div class="blob-bg bottom-[10%] left-[-10%] bg-purple-500/20"></div>
+
+    <!-- Toast Container -->
     <div id="toast-container"></div>
 
-    <!-- Navbar (Fixed, Glassy) -->
-    <nav class="fixed top-0 w-full z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-      <div class="container mx-auto px-4 h-16 flex justify-between items-center">
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-xl">
+      <div class="container mx-auto px-4 lg:px-6 h-16 flex justify-between items-center">
         <!-- Logo -->
-        <a href="/" class="flex items-center gap-2 group">
-          <div class="w-8 h-8 rounded-lg gradient-bg text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-          </div>
-          <span class="font-bold text-lg tracking-tight">YT Finder</span>
+        <a href="/" class="flex items-center gap-2.5 font-bold text-lg tracking-tight group">
+            <img src="./logo.png" alt="" class="w-44">
         </a>
 
         <!-- Desktop Menu -->
-        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <a href="#features" class="hover:text-foreground transition-colors">Features</a>
-          <a href="/first-comment.html" class="hover:text-foreground transition-colors">First Comment</a>
-          <a href="/ai-analysis.html" class="hover:text-foreground transition-colors">AI Analysis</a>
-          <a href="/export-data.html" class="hover:text-foreground transition-colors">Export</a>
-          <a href="/blog/comment-history.html" class="hover:text-foreground transition-colors">Comment History</a>
+        <div class="hidden md:flex items-center gap-1 bg-secondary/50 p-1 rounded-full border border-white/5">
+            <a href="/" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Home</a>
+            <a href="/first-comment.html" class="px-4 py-1.5 text-sm font-medium text-foreground bg-background shadow-sm rounded-full transition-all">First Comment</a>
+            <a href="/blog/comment-history.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Blog</a>
+            <a href="/ai-analysis.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">AI Analysis</a>
+            <a href="/export-data.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Export</a>
+            <a href="/privacy.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Privacy</a>
+            <a href="/terms.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Terms</a>
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center gap-4">
-          <button id="theme-toggle" class="p-2 rounded-md hover:bg-muted text-muted-foreground transition-colors">
-            <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
-            <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+        <div class="flex items-center gap-3">
+          <button id="theme-toggle" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary text-muted-foreground transition-colors">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
           </button>
           
-          <a href="#search" class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium gradient-bg text-white shadow hover:opacity-90 transition-opacity">
+          <a href="/index.html" class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-full text-sm font-semibold bg-primary text-white shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all">
             Get Started
           </a>
+
+          <!-- Mobile Menu Button -->
+          <button class="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors" onclick="toggleMobileMenu()">
+              <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
         </div>
+      </div>
+
+      <!-- Mobile Menu Dropdown -->
+      <div id="mobileMenu" class="hidden md:hidden absolute top-16 left-0 w-full bg-background border-b border-border shadow-2xl p-4 flex flex-col gap-2 z-50 animate-fade-in-up">
+          <a href="/" class="px-4 py-3 text-sm font-bold text-primary bg-primary/5 rounded-lg">Search</a>
+          <a href="/first-comment.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">First comment</a>
+          <a href="/blog/comment-history.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Comment History</a>
+          <a href="/ai-analysis.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">AI Analysis</a>
+          <a href="/export-data.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Export</a>
       </div>
     </nav>
 
-    <main class="flex-grow pt-16">
+    <main class="flex-grow pt-28 pb-12">
+      
       <!-- Hero Section -->
-      <section class="section-padding relative overflow-hidden">
-        <div
-          class="absolute inset-0 bg-gradient-to-br from-primary-start/5 via-secondary-start/5 to-accent-start/5 pointer-events-none"
-        ></div>
+      <section class="container mx-auto px-4 text-center mb-24 animate-fade-in-up" id="search">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wide mb-6">
+            <i data-lucide="crown" class="w-3 h-3"></i> Viral Comment Detection
+        </div>
 
-        <div
-          class="container mx-auto px-4 relative max-w-4xl text-center animate-fade-in"
-        >
-          <div
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary-start/10 to-primary-end/10 text-primary-start border border-primary-start/20 text-sm font-medium mb-6"
-          >
-            <i data-lucide="crown" class="w-4 h-4"></i>
-            Viral Comment Detection
-          </div>
-
-          <h1
-            class="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight"
-          >
-            Find the First Comment on YouTube <br class="hidden md:block" />
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+            Find the First Comment <br class="hidden md:block" />
             <span class="gradient-text">Instantly</span>
-          </h1>
+        </h1>
+        
+        <p class="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+            You and your friends making a bet? Use our 100% free tool to pinpoint the very first comment on any public YouTube video in under one second.
+        </p>
 
-          <p class="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-            You and your friends making a bet? Use our 100% free tool to
-            pinpoint the very first comment on any public YouTube video in under
-            one second.
-          </p>
-
-          <!-- Search Form -->
-          <div class="max-w-2xl mx-auto mb-8 relative group">
-            <div
-              class="absolute -inset-1 bg-gradient-to-r from-primary-start to-primary-end rounded-lg opacity-20 blur transition duration-500 group-hover:opacity-40"
-            ></div>
-            <div
-              class="relative flex flex-col sm:flex-row gap-2 bg-background p-2 rounded-lg border border-border shadow-xl"
-            >
-              <div class="relative flex-1">
-                <i
-                  data-lucide="youtube"
-                  class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground"
-                ></i>
-                <input
-                  type="url"
-                  id="urlInput"
-                  placeholder="Paste YouTube Video URL here"
-                  class="w-full h-12 pl-12 pr-4 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-base"
-                />
-              </div>
-              <button
-                onclick="handleSearch()"
-                id="searchBtn"
-                class="h-12 px-8 bg-gradient-to-r from-primary-start to-primary-end text-white font-medium rounded-md hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-sm whitespace-nowrap pulse-glow"
-              >
-                <i data-lucide="search" class="w-4 h-4"></i>
-                Find First Comment
-              </button>
-            </div>
-          </div>
-
-          <!-- [修改] Result Card Container - 初始隐藏 -->
-          <div
-            id="resultContainer"
-            class="hidden max-w-2xl mx-auto bg-card rounded-xl border border-border p-6 shadow-sm gradient-border text-left"
-          >
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <div class="bg-green-100 dark:bg-green-900/30 p-1 rounded-full">
-                  <i
-                    data-lucide="check"
-                    class="w-4 h-4 text-green-600 dark:text-green-400"
-                  ></i>
+        <!-- Search Form -->
+        <div class="max-w-2xl mx-auto mb-10 relative z-10">
+            <div class="glass-card p-2 flex flex-col sm:flex-row gap-2 transition-all focus-within:ring-2 ring-primary/20 border border-border">
+                <div class="relative flex-1">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        <i data-lucide="youtube" class="w-5 h-5"></i>
+                    </div>
+                    <input 
+                        type="url" 
+                        id="urlInput"
+                        placeholder="Paste YouTube Video URL here..." 
+                        class="w-full h-12 pl-10 pr-10 bg-transparent border-none text-foreground placeholder:text-muted-foreground focus:outline-none text-base font-medium rounded-lg"
+                        autocomplete="off"
+                    />
+                    <!-- Clear Button -->
+                    <button id="clearInput" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onclick="clearInputBox()">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                    </button>
                 </div>
-                <h3 class="font-semibold text-foreground">
-                  First Comment Found
-                </h3>
-              </div>
-              <span
-                id="searchTime"
-                class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded"
-                >Time: 0.8s</span
-              >
-            </div>
-
-            <div
-              class="bg-gradient-to-r from-primary-start/5 to-secondary-start/5 rounded-lg p-4 mb-4 border border-primary-start/10"
-            >
-              <div class="flex items-start gap-3">
-                <div
-                  id="authorAvatar"
-                  class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center flex-shrink-0 overflow-hidden ring-2 ring-background"
+                <button 
+                    onclick="handleSearch()" 
+                    id="searchBtn"
+                    class="h-12 px-8 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-primary/25 whitespace-nowrap"
                 >
-                  <!-- Avatar injected via JS -->
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    Find First
+                </button>
+            </div>
+            <p class="text-xs text-muted-foreground mt-3">Press <kbd class="font-mono bg-secondary px-1 rounded border border-border">Enter</kbd> to search</p>
+        </div>
+
+        <!-- Result Card Container (Initial Hidden) -->
+        <div id="resultContainer" class="hidden max-w-2xl mx-auto glass-card p-0 overflow-hidden text-left animate-fade-in-up">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/20 dark:to-amber-900/20 p-4 flex justify-between items-center border-b border-yellow-200/50 dark:border-yellow-700/20">
+                <div class="flex items-center gap-2">
+                    <div class="bg-yellow-400 text-white p-1 rounded-full shadow-sm">
+                         <i data-lucide="trophy" class="w-4 h-4 fill-current"></i>
+                    </div>
+                    <span class="font-bold text-yellow-700 dark:text-yellow-500 text-sm">First Comment Found!</span>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 mb-1 flex-wrap">
-                    <span
-                      id="authorName"
-                      class="font-bold text-foreground text-sm"
-                      >Username</span
-                    >
-                    <span class="text-xs text-muted-foreground">•</span>
-                    <span id="publishDate" class="text-xs text-muted-foreground"
-                      >Date</span
-                    >
-                  </div>
-                  <p
-                    id="commentText"
-                    class="text-foreground text-sm break-words whitespace-pre-wrap leading-relaxed"
-                  >
-                    Comment text...
-                  </p>
-                </div>
-              </div>
+                <span id="searchTime" class="text-xs font-mono bg-white/50 dark:bg-black/20 px-2 py-1 rounded text-yellow-800 dark:text-yellow-400">Time: 0.8s</span>
             </div>
 
-            <!-- Actions -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button
-                onclick="copyToClipboard()"
-                class="flex items-center justify-center gap-2 text-sm font-medium text-foreground bg-secondary/30 hover:bg-secondary/50 px-3 py-2 rounded-md transition-colors border border-secondary/50"
-              >
-                <i data-lucide="copy" class="w-4 h-4"></i> Copy Text
-              </button>
-              <button
-                onclick="shareOnTwitter()"
-                class="flex items-center justify-center gap-2 text-sm font-medium text-foreground bg-secondary/30 hover:bg-secondary/50 px-3 py-2 rounded-md transition-colors border border-secondary/50"
-              >
-                <i data-lucide="twitter" class="w-4 h-4"></i> Share on X
-              </button>
-              <button
-                onclick="shareLink()"
-                class="flex items-center justify-center gap-2 text-sm font-medium text-foreground bg-secondary/30 hover:bg-secondary/50 px-3 py-2 rounded-md transition-colors border border-secondary/50"
-              >
-                <i data-lucide="youtube" class="w-4 h-4"></i> Open in YT
-              </button>
+            <div class="p-6">
+                <!-- Comment Content -->
+                <div class="flex items-start gap-4 mb-6">
+                    <div id="authorAvatar" class="w-12 h-12 rounded-full bg-secondary flex-shrink-0 overflow-hidden border-2 border-border shadow-sm">
+                        <!-- JS Injected -->
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <span id="authorName" class="font-bold text-foreground">Username</span>
+                            <span class="text-xs text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">Author</span>
+                            <span class="text-xs text-muted-foreground">•</span>
+                            <span id="publishDate" class="text-xs text-muted-foreground">Date</span>
+                        </div>
+                        <p id="commentText" class="text-foreground text-sm leading-relaxed whitespace-pre-wrap break-words">
+                            Loading comment text...
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                     <button onclick="copyToClipboard()" class="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium bg-secondary hover:bg-secondary/80 rounded-lg transition-colors border border-border text-foreground">
+                        <i data-lucide="copy" class="w-3 h-3"></i> Copy Text
+                     </button>
+                     <button onclick="shareOnTwitter()" class="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium bg-secondary hover:bg-secondary/80 rounded-lg transition-colors border border-border text-foreground">
+                        <i data-lucide="twitter" class="w-3 h-3"></i> Share Result
+                     </button>
+                     <a id="openYtLink" href="#" target="_blank" class="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium bg-red-50 hover:bg-red-100 dark:bg-red-900/10 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg transition-colors border border-red-200 dark:border-red-900/30">
+                        <i data-lucide="external-link" class="w-3 h-3"></i> Open in YouTube
+                     </a>
+                </div>
             </div>
-          </div>
         </div>
       </section>
 
-      <!-- Viral Spread Potential Section -->
-      <section
-        class="py-16 bg-gradient-to-br from-background to-secondary/5 border-y border-border"
-      >
-        <div class="container mx-auto px-4 max-w-4xl">
+      <!-- Viral Potential Section -->
+      <section class="container mx-auto px-4 mb-24">
+          <div class="grid md:grid-cols-2 gap-12 items-center">
+             <div>
+                 <h2 class="text-3xl font-bold mb-6">Why First Comments Go Viral</h2>
+                 <p class="text-muted-foreground mb-6 leading-relaxed">
+                     Understanding the mechanics behind viral first comments can help you craft your own attention-grabbing opener. The "First" comment often gets pinned or accumulates thousands of likes simply due to visibility.
+                 </p>
+                 <div class="space-y-4">
+                     <div class="glass-card p-4 flex gap-4 items-center">
+                         <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center flex-shrink-0 font-bold">1</div>
+                         <div>
+                             <h4 class="font-bold text-sm">Timing is Everything</h4>
+                             <p class="text-xs text-muted-foreground">Premiere watchers have the highest success rate.</p>
+                         </div>
+                     </div>
+                     <div class="glass-card p-4 flex gap-4 items-center">
+                         <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center flex-shrink-0 font-bold">2</div>
+                         <div>
+                             <h4 class="font-bold text-sm">Simplicity Wins</h4>
+                             <p class="text-xs text-muted-foreground">Short comments like "Early squad" often win.</p>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+             
+             <!-- Stats/Graph Placeholder -->
+             <div class="glass-card p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
+                 <div class="w-20 h-20 rounded-full bg-secondary mb-4 flex items-center justify-center animate-pulse-slow">
+                     <i data-lucide="trending-up" class="w-10 h-10 text-primary"></i>
+                 </div>
+                 <h3 class="text-2xl font-bold mb-2 text-foreground">1,402</h3>
+                 <p class="text-sm text-muted-foreground uppercase tracking-widest">First Comments Found Today</p>
+             </div>
+          </div>
+      </section>
+      
+      <!-- Comparison Section (New) -->
+      <section class="container mx-auto px-4 mb-24">
           <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-foreground mb-4">
-              Why First Comments Go Viral
-            </h2>
-            <p class="text-muted-foreground max-w-2xl mx-auto">
-              Understanding the mechanics behind viral first comments can help
-              you craft your own attention-grabbing opener.
-            </p>
+              <h2 class="text-3xl font-bold mb-4">Manual Scrolling vs. YT Finder</h2>
+              <p class="text-muted-foreground">Stop wasting your time scrolling endlessly.</p>
           </div>
-
-          <div class="grid md:grid-cols-3 gap-6">
-            <div class="step-card text-center">
-              <div
-                class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center mx-auto mb-4"
-              >
-                <span class="text-white font-bold">1</span>
+          
+          <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <!-- Old Way -->
+              <div class="glass-card p-6 border-red-200/50 dark:border-red-900/30 relative overflow-hidden">
+                  <div class="absolute top-0 right-0 p-4 text-red-500 opacity-20">
+                      <i data-lucide="x" class="w-24 h-24"></i>
+                  </div>
+                  <h3 class="font-bold text-lg mb-4 text-red-500">The Old Way</h3>
+                  <ul class="space-y-3 text-sm text-muted-foreground">
+                      <li class="flex gap-2"><i data-lucide="clock" class="w-4 h-4"></i> Takes 10+ minutes of scrolling</li>
+                      <li class="flex gap-2"><i data-lucide="cpu" class="w-4 h-4"></i> Freezes your browser (RAM usage)</li>
+                      <li class="flex gap-2"><i data-lucide="eye-off" class="w-4 h-4"></i> Easy to miss the actual first post</li>
+                  </ul>
               </div>
-              <h3 class="text-xl font-semibold text-foreground mb-2">
-                Timing is Everything
-              </h3>
-              <p class="text-muted-foreground">
-                The fastest typists who watch premieres live have the best
-                chance of securing the #1 spot.
-              </p>
-            </div>
-
-            <div class="step-card text-center">
-              <div
-                class="w-12 h-12 rounded-full bg-gradient-to-br from-secondary-start to-secondary-end flex items-center justify-center mx-auto mb-4"
-              >
-                <span class="text-white font-bold">2</span>
+              
+              <!-- New Way -->
+              <div class="glass-card p-6 border-green-200/50 dark:border-green-900/30 relative overflow-hidden bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-900/10">
+                  <div class="absolute top-0 right-0 p-4 text-green-500 opacity-20">
+                      <i data-lucide="check" class="w-24 h-24"></i>
+                  </div>
+                  <h3 class="font-bold text-lg mb-4 text-green-600 dark:text-green-400">YT Comment Finder</h3>
+                  <ul class="space-y-3 text-sm text-muted-foreground">
+                      <li class="flex gap-2"><i data-lucide="zap" class="w-4 h-4 text-green-500"></i> Instant Results (< 1 second)</li>
+                      <li class="flex gap-2"><i data-lucide="server" class="w-4 h-4 text-green-500"></i> Zero browser lag (Cloud processed)</li>
+                      <li class="flex gap-2"><i data-lucide="target" class="w-4 h-4 text-green-500"></i> 100% API Accuracy</li>
+                  </ul>
               </div>
-              <h3 class="text-xl font-semibold text-foreground mb-2">
-                Simple Works Best
-              </h3>
-              <p class="text-muted-foreground">
-                Short, punchy comments like "First!" or "Beat you to it!" are
-                most likely to claim the top spot.
-              </p>
-            </div>
-
-            <div class="step-card text-center">
-              <div
-                class="w-12 h-12 rounded-full bg-gradient-to-br from-accent-start to-accent-end flex items-center justify-center mx-auto mb-4"
-              >
-                <span class="text-white font-bold">3</span>
-              </div>
-              <h3 class="text-xl font-semibold text-foreground mb-2">
-                Viral Potential
-              </h3>
-              <p class="text-muted-foreground">
-                First comments on viral videos often gain thousands of views
-                themselves, creating unexpected fame.
-              </p>
-            </div>
           </div>
-        </div>
+      </section>
+
+      <!-- New Content: The Culture -->
+      <section class="container mx-auto px-4 mb-24 max-w-3xl">
+          <div class="glass-card p-8">
+              <h2 class="text-2xl font-bold mb-4">The Culture of "First!"</h2>
+              <div class="prose dark:prose-invert text-sm text-muted-foreground leading-relaxed space-y-4">
+                  <p>
+                      The phenomenon of commenting "First" dates back to the early days of blogs and forums in the early 2000s. It migrated to YouTube shortly after its launch in 2005. For many users, being the first to comment on a video from a popular creator is a digital badge of honor—proof of their dedication and speed.
+                  </p>
+                  <p>
+                      While YouTube has tried to change comment sorting algorithms over the years to favor "Top" (most liked) comments, the "Newest First" filter remains a battleground for early squad members. Our tool settles the debate of who actually won that race.
+                  </p>
+              </div>
+          </div>
       </section>
 
       <!-- How It Works Section -->
-      <section class="section-padding bg-background">
-        <div class="container mx-auto px-4 max-w-3xl">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-foreground mb-4">
-              How Our First Comment Finder Works
-            </h2>
-            <p class="text-muted-foreground">
-              Our tool leverages the YouTube Data API to instantly locate the
-              first comment on any public video.
-            </p>
-          </div>
+      <section id="how-it-works" class="container mx-auto px-4 mb-24">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">How It Works</h2>
+            <p class="text-muted-foreground">Powered by official YouTube Data API.</p>
+        </div>
 
-          <div class="space-y-8">
-            <div class="flex gap-6">
-              <div
-                class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white font-bold"
-              >
-                1
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold text-foreground mb-2">
-                  Enter Video URL
-                </h3>
-                <p class="text-muted-foreground">
-                  Paste any YouTube video URL into our search bar. Works with
-                  videos of any age or view count.
-                </p>
-              </div>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="glass-card p-6 text-center">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4 font-bold text-lg">1</div>
+                <h3 class="text-lg font-bold mb-2">Paste URL</h3>
+                <p class="text-sm text-muted-foreground">Paste any public YouTube video link. We support Videos, Shorts, and Livestreams.</p>
             </div>
+            
+            <div class="glass-card p-6 text-center">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4 font-bold text-lg">2</div>
+                <h3 class="text-lg font-bold mb-2">API Scan</h3>
+                <p class="text-sm text-muted-foreground">Our engine queries the API, sorting chronologically to find the true oldest timestamp.</p>
+            </div>
+            
+            <div class="glass-card p-6 text-center">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4 font-bold text-lg">3</div>
+                <h3 class="text-lg font-bold mb-2">Verify</h3>
+                <p class="text-sm text-muted-foreground">We display the winner instantly. Click "Open in YouTube" to verify the proof.</p>
+            </div>
+        </div>
 
-            <div class="flex gap-6">
-              <div
-                class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white font-bold"
-              >
-                2
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold text-foreground mb-2">
-                  API Processing
-                </h3>
-                <p class="text-muted-foreground">
-                  Our system queries the YouTube Data API with specialized
-                  sorting parameters to identify the chronological first
-                  comment.
-                </p>
-              </div>
+        <div class="mt-8 glass-card p-4 border-l-4 border-primary flex items-start gap-4 max-w-2xl mx-auto">
+            <i data-lucide="lightbulb" class="w-5 h-5 text-primary flex-shrink-0 mt-0.5"></i>
+            <div>
+                <p class="font-bold text-sm mb-1">Pro Tip: Premiere Check</p>
+                <p class="text-xs text-muted-foreground">Videos with live premieres often have comments timestamped BEFORE the video actually started playing!</p>
             </div>
-
-            <div class="flex gap-6">
-              <div
-                class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white font-bold"
-              >
-                3
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold text-foreground mb-2">
-                  Instant Results
-                </h3>
-                <p class="text-muted-foreground">
-                  Within milliseconds, we present the verified first comment
-                  along with timestamp and user information.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="pro-tip mt-12">
-            <div class="flex items-start gap-3">
-              <i
-                data-lucide="lightbulb"
-                class="w-5 h-5 text-primary-start flex-shrink-0 mt-0.5"
-              ></i>
-              <div>
-                <p class="font-bold mb-2">
-                  Pro Tip: Check Video Premiere Times
-                </p>
-                <p class="text-muted-foreground">
-                  Videos with live premieres often have the most competitive
-                  first comment races. Check the video's premiere time and queue
-                  up your comment 30 seconds early!
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       <!-- FAQ Section -->
-      <section class="section-padding bg-secondary/10 border-y border-border">
-        <div class="container mx-auto px-4 max-w-3xl">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-foreground mb-4">
-              Frequently Asked Questions
-            </h2>
-            <p class="text-muted-foreground">
-              Everything you need to know about finding first YouTube comments.
-            </p>
-          </div>
-
-          <div class="space-y-6">
-            <div class="step-card">
-              <h3 class="text-lg font-semibold text-foreground mb-2">
-                Can I find first comments on private or unlisted videos?
-              </h3>
-              <p class="text-muted-foreground">
-                No, our tool only works with publicly accessible videos. Private
-                and unlisted videos require special permissions that our tool
-                doesn't have.
-              </p>
-            </div>
-
-            <div class="step-card">
-              <h3 class="text-lg font-semibold text-foreground mb-2">
-                Is there a limit to how many times I can use this tool?
-              </h3>
-              <p class="text-muted-foreground">
-                Absolutely not! Our first comment finder is completely free and
-                unlimited. Find the first comment on as many videos as you'd
-                like.
-              </p>
-            </div>
-
-            <div class="step-card">
-              <h3 class="text-lg font-semibold text-foreground mb-2">
-                What if the first comment was deleted?
-              </h3>
-              <p class="text-muted-foreground">
-                YouTube's API will show the earliest available comment. If the
-                actual first comment was deleted, it will show the next oldest
-                comment.
-              </p>
-            </div>
-          </div>
+      <section class="container mx-auto px-4 max-w-3xl mb-24">
+        <h2 class="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
+        
+        <div class="space-y-4">
+            <details class="glass-card px-6 py-4 group cursor-pointer">
+                <summary class="font-medium list-none flex items-center justify-between">
+                    <span>Can I find first comments on deleted videos?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180"></i>
+                </summary>
+                <p class="mt-3 text-sm text-muted-foreground leading-relaxed">
+                    No. If a video is deleted or private, the comments are inaccessible via the API.
+                </p>
+            </details>
+            
+            <details class="glass-card px-6 py-4 group cursor-pointer">
+                <summary class="font-medium list-none flex items-center justify-between">
+                    <span>What if the first comment was deleted?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180"></i>
+                </summary>
+                <p class="mt-3 text-sm text-muted-foreground leading-relaxed">
+                    The API returns the *current* oldest comment. If the original author deleted their post, we show the next one in line.
+                </p>
+            </details>
+            
+            <details class="glass-card px-6 py-4 group cursor-pointer">
+                <summary class="font-medium list-none flex items-center justify-between">
+                    <span>Is this tool free?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180"></i>
+                </summary>
+                <p class="mt-3 text-sm text-muted-foreground leading-relaxed">
+                    Yes, 100% free and unlimited. Use it to settle as many bets as you want.
+                </p>
+            </details>
         </div>
       </section>
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-border bg-card">
-      <div class="container mx-auto px-4 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <a href="/" class="flex items-center gap-2 mb-4">
-              <div
-                class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center"
-              >
-                <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+    <footer class="border-t border-border/50 bg-background/50 py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-12">
+          <div class="col-span-1 md:col-span-2">
+            <a href="/" class="flex items-center gap-2 mb-6 font-bold text-xl">
+              <div class="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center">
+                 <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
               </div>
-              <span class="font-bold text-lg">YT Finder</span>
+              YT Finder
             </a>
-            <p class="text-muted-foreground text-sm mb-4">
-              The fastest way to search, analyze, and export YouTube comments.
+            <p class="text-sm text-muted-foreground leading-relaxed max-w-sm mb-6">
+              The professional standard for YouTube comment analysis and data extraction. Built for creators, marketers, and data analysts.
             </p>
-            <div class="flex gap-3">
-              <a
-                href="#"
-                class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-              >
-                <i data-lucide="twitter" class="w-4 h-4"></i>
-              </a>
-              <a
-                href="#"
-                class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-              >
-                <i data-lucide="github" class="w-4 h-4"></i>
-              </a>
-              <a
-                href="#"
-                class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-              >
-                <i data-lucide="linkedin" class="w-4 h-4"></i>
-              </a>
+            <div class="flex gap-4">
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
             </div>
           </div>
-
+          
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Product</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <a href="/" class="hover:text-foreground transition-colors"
-                  >Search</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/first-comment"
-                  class="hover:text-foreground transition-colors"
-                  >First Comment</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/ai-analysis"
-                  class="hover:text-foreground transition-colors"
-                  >AI Analysis</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/export-data"
-                  class="hover:text-foreground transition-colors"
-                  >Export</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/user-search"
-                  class="hover:text-foreground transition-colors"
-                  >User Search</a
-                >
-              </li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Product</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/" class="hover:text-primary transition-colors">Search</a></li>
+              <li><a href="/ai-analysis.html" class="hover:text-primary transition-colors">AI Analysis</a></li>
+              <li><a href="/export-data.html" class="hover:text-primary transition-colors">Export</a></li>
+              <li><a href="/ai-analysis.html" class="hover:text-primary transition-colors">AI Analysis</a></li>
+              <li><a href="/first-comment.html" class="hover:text-primary transition-colors">First Comment</a></li>
             </ul>
           </div>
-
+          
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Resources</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <a href="/blog" class="hover:text-foreground transition-colors"
-                  >Blog</a
-                >
-              </li>
-              <li>
-                <a href="/docs" class="hover:text-foreground transition-colors"
-                  >Documentation</a
-                >
-              </li>
-              <li>
-                <a href="/api" class="hover:text-foreground transition-colors"
-                  >API</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/support"
-                  class="hover:text-foreground transition-colors"
-                  >Support</a
-                >
-              </li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Resources</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/blog/comment-history.html" class="hover:text-primary transition-colors">Blog</a></li>
             </ul>
           </div>
-
+          
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Legal</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <a
-                  href="/privacy"
-                  class="hover:text-foreground transition-colors"
-                  >Privacy Policy</a
-                >
-              </li>
-              <li>
-                <a href="/terms" class="hover:text-foreground transition-colors"
-                  >Terms of Service</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/contact"
-                  class="hover:text-foreground transition-colors"
-                  >Contact Us</a
-                >
-              </li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Legal</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/privacy.html" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms.html" class="hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><a href="/about.html" class="hover:text-primary transition-colors">About Us</a></li>
             </ul>
           </div>
         </div>
-
-        <div
-          class="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground"
-        >
-          <p>
-            © 2025 YT Comment Finder. This site is not affiliated with YouTube
-            or Google.
-          </p>
+        
+        <div class="pt-8 border-t border-border/50 mt-12 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+          <p>© 2025 YT Comment Finder. All rights reserved.</p>
+          <div class="flex items-center gap-6 mt-4 md:mt-0">
+             <p>Not affiliated with Google LLC.</p>
+             <div class="flex items-center gap-2">
+                 <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                 <span>All Systems Normal</span>
+             </div>
+          </div>
         </div>
       </div>
     </footer>
@@ -1280,41 +614,70 @@
       // Theme Logic
       const themeToggle = document.getElementById("theme-toggle");
       const html = document.documentElement;
-      if (
-        localStorage.getItem("theme") === "dark" ||
-        (!("theme" in localStorage) &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ) {
-        html.classList.add("dark");
+      
+      function updateTheme() {
+          if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            html.classList.add("dark");
+          } else {
+            html.classList.remove("dark");
+          }
       }
+      updateTheme();
+
       themeToggle.addEventListener("click", () => {
         html.classList.toggle("dark");
-        localStorage.setItem(
-          "theme",
-          html.classList.contains("dark") ? "dark" : "light"
-        );
+        localStorage.theme = html.classList.contains("dark") ? "dark" : "light";
         lucide.createIcons();
       });
+
+      // Mobile Menu Toggle
+      function toggleMobileMenu() {
+          const menu = document.getElementById('mobileMenu');
+          menu.classList.toggle('hidden');
+      }
+
+      // Input Logic (Clear Button & Enter Key)
+      const urlInput = document.getElementById('urlInput');
+      const clearBtn = document.getElementById('clearInput');
+      
+      urlInput.addEventListener('input', (e) => {
+        if(e.target.value.length > 0) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      });
+
+      urlInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            handleSearch();
+        }
+      });
+
+      function clearInputBox() {
+        urlInput.value = '';
+        clearBtn.classList.add('hidden');
+        urlInput.focus();
+      }
 
       // Toast Function
       function showToast(message, type = "success") {
         const container = document.getElementById("toast-container");
         const toast = document.createElement("div");
-        toast.className = `toast ${
-          type === "success" ? "toast-success" : "toast-error"
-        }`;
-
-        let color = type === "success" ? "#10b981" : "#ef4444";
-        toast.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        <span>${message}</span>
-      `;
+        toast.className = 'toast';
+        
+        const icon = type === "success" 
+            ? `<i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>` 
+            : `<i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i>`;
+            
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        
         container.appendChild(toast);
-
-        requestAnimationFrame(() => toast.classList.add("show"));
+        lucide.createIcons();
+        
+        // Remove after delay
         setTimeout(() => {
-          toast.classList.remove("show");
-          setTimeout(() => toast.remove(), 300);
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            setTimeout(() => toast.remove(), 300);
         }, 3000);
       }
 
@@ -1325,6 +688,7 @@
           /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?]+)/,
           /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)/,
           /(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([^?]+)/,
+          /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([^?]+)/
         ];
         for (const pattern of regexPatterns) {
           const match = url.match(pattern);
@@ -1335,18 +699,20 @@
 
       function formatDate(dateString) {
         if (!dateString) return "";
-        return new Date(dateString).toLocaleString();
+        return new Date(dateString).toLocaleString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
       }
 
       // ==========================================
-      // 2. Action Functions (Copy, Share, Link)
+      // 2. Action Functions
       // ==========================================
       function copyToClipboard() {
         if (!currentCommentText) return;
         navigator.clipboard
           .writeText(currentCommentText)
           .then(() => {
-            showToast("Comment text copied!");
+            showToast("Comment copied!");
           })
           .catch(() => {
             showToast("Failed to copy", "error");
@@ -1356,28 +722,15 @@
       function shareOnTwitter() {
         if (!currentCommentText) return;
         const text = encodeURIComponent(
-          `Found the first comment on this video! \n\n"${currentCommentText.substring(
-            0,
-            100
-          )}${
-            currentCommentText.length > 100 ? "..." : ""
-          }"\n\nFind yours here: https://ytcommentfinder.com/first-comment`
+          `Found the first comment on this video! 🏆\n\n"${currentCommentText.substring(0, 80)}${currentCommentText.length > 80 ? "..." : ""}"\n\nvia YT Comment Finder`
         );
         const url = `https://twitter.com/intent/tweet?text=${text}`;
         window.open(url, "_blank");
       }
 
-      function shareLink() {
-        if (!currentVideoId || !currentCommentId)
-          return showToast("Link not available", "error");
-        const url = `https://www.youtube.com/watch?v=${currentVideoId}&lc=${currentCommentId}`;
-        window.open(url, "_blank");
-      }
-
       function resetSearchButton() {
         const btn = document.getElementById("searchBtn");
-        btn.innerHTML =
-          '<i data-lucide="search" class="w-4 h-4"></i> Find First Comment';
+        btn.innerHTML = '<i data-lucide="search" class="w-4 h-4"></i> Find First';
         btn.disabled = false;
         lucide.createIcons();
       }
@@ -1385,19 +738,17 @@
       function displayResult(comment) {
         const container = document.getElementById("resultContainer");
         container.classList.remove("hidden");
-        container.classList.add("animate-fade-in");
-
+        
         // Parse Data
         let authorName, text, date, img, commentId;
 
-        // Handle different data structures (flat or nested)
         if (comment.snippet && comment.snippet.topLevelComment) {
           const s = comment.snippet.topLevelComment.snippet;
           authorName = s.authorDisplayName;
           text = s.textDisplay;
           date = s.publishedAt;
           img = s.authorProfileImageUrl;
-          commentId = comment.id; // topLevel ID
+          commentId = comment.id; 
         } else {
           authorName = comment.authorDisplayName || "Unknown";
           text = comment.textDisplay || "";
@@ -1406,15 +757,22 @@
           commentId = comment.id;
         }
 
-        // Store globally for actions
         currentCommentText = text;
         currentCommentId = commentId;
 
-        // Update UI
+        // UI Updates
         document.getElementById("authorName").textContent = authorName;
         document.getElementById("publishDate").textContent = formatDate(date);
-        // Use innerHTML for textDisplay to render emojis/links correctly if safe, otherwise textContent
-        document.getElementById("commentText").innerHTML = text;
+        document.getElementById("commentText").innerHTML = text; // InnerHTML for links/emojis
+
+        // Direct Link
+        const ytLink = document.getElementById("openYtLink");
+        if(currentVideoId && currentCommentId) {
+             ytLink.href = `https://www.youtube.com/watch?v=${currentVideoId}&lc=${currentCommentId}`;
+             ytLink.classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+             ytLink.classList.add('opacity-50', 'pointer-events-none');
+        }
 
         // Avatar
         const avatarContainer = document.getElementById("authorAvatar");
@@ -1422,7 +780,12 @@
           avatarContainer.innerHTML = `<img src="${img}" alt="${authorName}" class="w-full h-full object-cover">`;
         } else {
           const initial = authorName.charAt(0).toUpperCase();
-          avatarContainer.innerHTML = `<span class="text-sm font-bold text-white">${initial}</span>`;
+          avatarContainer.innerHTML = `<span class="w-full h-full flex items-center justify-center font-bold text-muted-foreground bg-secondary">${initial}</span>`;
+        }
+        
+        // Scroll to result on mobile
+        if(window.innerWidth < 768) {
+            container.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         resetSearchButton();
@@ -1440,34 +803,28 @@
       socket.on("connect", () => console.log("Connected to backend"));
 
       socket.on("videoInfo", (info) => {
-        console.log("Video Info:", info);
+        // We have video info, now ask for first comment
         socket.emit("getFirstComment");
       });
 
-      // Listen for comments (The array of comments)
       socket.on("groupComments", (data) => {
         if (data && data.items && data.items.length > 0) {
-          displayResult(data.items[0]); // Display the first one
+          displayResult(data.items[0]); 
+          showToast("First comment found!", "success");
         } else {
-          if (data.totalCount === 0) {
-            showToast("No comments found on this video.", "error");
+            showToast("No comments found.", "error");
             resetSearchButton();
-          }
         }
       });
 
       socket.on("idInvalid", () => {
-        showToast("Invalid Video ID.", "error");
+        showToast("Invalid Video ID or Private Video.", "error");
         resetSearchButton();
       });
-
-      // Loading progress
-      socket.on("loadStatus", (status) => {
-        if (typeof status === "number" && status > 0) {
-          const btn = document.getElementById("searchBtn");
-          btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Analyzed ${status} comments...`;
-          lucide.createIcons();
-        }
+      
+      socket.on("quotaExceeded", () => {
+        showToast("Server traffic high. Try later.", "error");
+        resetSearchButton();
       });
 
       // ==========================================
@@ -1477,33 +834,34 @@
         const urlInput = document.getElementById("urlInput");
         const url = urlInput.value.trim();
 
-        if (!url) return showToast("Please enter a URL", "error");
+        if (!url) {
+            urlInput.focus();
+            urlInput.parentElement.classList.add('ring-2', 'ring-red-500');
+            setTimeout(() => urlInput.parentElement.classList.remove('ring-2', 'ring-red-500'), 1000);
+            return;
+        }
 
         const videoId = extractVideoId(url);
         if (!videoId) return showToast("Invalid YouTube URL", "error");
 
         currentVideoId = videoId;
 
-        // Hide previous result
-        document.getElementById("resultContainer").classList.add("hidden");
-
-        // Set Loading UI
+        // UI Loading
         const btn = document.getElementById("searchBtn");
-        btn.innerHTML =
-          '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Searching...';
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Searching...';
         btn.disabled = true;
         lucide.createIcons();
 
         // Emit
         socket.emit("idSent", videoId);
-
-        // Timeout
+        
+        // Fallback timeout
         setTimeout(() => {
           if (btn.disabled) {
             resetSearchButton();
             showToast("Request timed out.", "error");
           }
-        }, 60000);
+        }, 15000);
       }
     </script>
   </body>

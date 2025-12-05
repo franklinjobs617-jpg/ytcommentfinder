@@ -11,13 +11,10 @@
     />
     <link rel="canonical" href="https://www.ytcommentfinder.com/export-data">
 
-    <!-- Fonts: Inter (Shadcn Standard) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -33,13 +30,12 @@
             colors: {
               border: "var(--border)",
               input: "var(--input)",
-              ring: "var(--ring)",
               background: "var(--background)",
               foreground: "var(--foreground)",
               primary: {
                 DEFAULT: "var(--primary)",
                 foreground: "var(--primary-foreground)",
-                10: "rgba(59, 130, 246, 0.1)",
+                glow: "var(--primary-glow)",
               },
               secondary: {
                 DEFAULT: "var(--secondary)",
@@ -49,21 +45,24 @@
                 DEFAULT: "var(--muted)",
                 foreground: "var(--muted-foreground)",
               },
-              accent: {
-                DEFAULT: "var(--accent)",
-                foreground: "var(--accent-foreground)",
-              },
               card: {
                 DEFAULT: "var(--card)",
                 foreground: "var(--card-foreground)",
-              },
+              }
+            },
+            backgroundImage: {
+              'dot-pattern': "radial-gradient(var(--dot-color) 1px, transparent 1px)",
+            },
+            boxShadow: {
+               'glow': '0 0 40px -10px var(--primary-glow)',
+               'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
             },
             animation: {
-              'fade-in': 'fadeIn 0.5s ease-out',
+              'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
             },
             keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               }
             }
@@ -73,557 +72,554 @@
     </script>
     <style>
       :root {
+        /* Light Mode */
         --background: #ffffff;
-        --foreground: #09090b;
-        --card: #ffffff;
-        --card-foreground: #09090b;
-        --primary: #3b82f6; /* Blue-500, 与首页保持一致 */
-        --primary-start: #3b82f6;
-        --primary-end: #8b5cf6;
+        --foreground: #0f172a;
+        
+        --card: rgba(255, 255, 255, 0.7);
+        --card-foreground: #0f172a;
+        
+        --primary: #4f46e5;
         --primary-foreground: #ffffff;
-        --secondary: #f4f4f5;
-        --secondary-foreground: #18181b;
-        --muted: #f4f4f5;
-        --muted-foreground: #71717a;
-        --accent: #f4f4f5;
-        --accent-foreground: #18181b;
-        --border: #e4e4e7;
-        --input: #e4e4e7;
-        --radius: 0.5rem;
+        --primary-glow: rgba(79, 70, 229, 0.3);
+        
+        --secondary: #f8fafc;
+        --secondary-foreground: #0f172a;
+        
+        --muted: #f1f5f9;
+        --muted-foreground: #64748b;
+        
+        --border: #e2e8f0;
+        --input: #f1f5f9;
+        
+        --dot-color: #cbd5e1;
+        --radius: 1rem;
       }
 
       .dark {
+        /* Dark Mode */
         --background: #09090b;
         --foreground: #fafafa;
-        --card: #09090b;
+        
+        --card: rgba(24, 24, 27, 0.6);
         --card-foreground: #fafafa;
-        --primary: #3b82f6;
-        --primary-start: #3b82f6;
-        --primary-end: #8b5cf6;
-        --primary-foreground: #fafafa;
+        
+        --primary: #6366f1;
+        --primary-foreground: #ffffff;
+        --primary-glow: rgba(99, 102, 241, 0.2);
+        
         --secondary: #27272a;
         --secondary-foreground: #fafafa;
-        --muted: #27272a;
+        
+        --muted: #18181b;
         --muted-foreground: #a1a1aa;
-        --accent: #27272a;
-        --accent-foreground: #fafafa;
+        
         --border: #27272a;
-        --input: #27272a;
+        --input: #18181b;
+        
+        --dot-color: #27272a;
       }
 
       body {
         background-color: var(--background);
         color: var(--foreground);
-        transition: background-color 0.3s, color 0.3s;
+        font-family: 'Inter', sans-serif;
       }
 
-      .section-padding {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
+      /* Background Effects */
+      .bg-grid {
+        background-size: 40px 40px;
+        background-image: var(--dot-pattern);
+        mask-image: linear-gradient(to bottom, transparent, 10% black, 80% black, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, transparent, 10% black, 80% black, transparent);
+        opacity: 0.5;
+        position: fixed; inset: 0; z-index: -1;
       }
 
-      .card-hover {
-        transition: all 0.3s ease;
-      }
-      .card-hover:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
-      }
-      .dark .card-hover:hover {
-        box-shadow: 0 10px 30px -10px rgba(255,255,255,0.05);
+      .blob-bg {
+        position: fixed;
+        width: 600px; height: 600px;
+        background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+        opacity: 0.12;
+        filter: blur(80px);
+        z-index: -1;
+        pointer-events: none;
       }
 
-      /* Image Placeholder for Assets */
+      /* Glass Cards */
+      .glass-card {
+        background: var(--card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: var(--radius);
+        box-shadow: var(--glass);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .dark .glass-card {
+        border: 1px solid rgba(255,255,255,0.05);
+      }
+      .glass-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px -10px rgba(0,0,0,0.1);
+      }
+
+      /* Image Placeholder */
       .img-placeholder {
         width: 100%;
         height: 100%;
         min-height: 200px;
-        background-color: var(--muted);
-        border: 2px dashed var(--border);
+        background-color: var(--secondary);
+        border: 1px dashed var(--border);
         border-radius: var(--radius);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         color: var(--muted-foreground);
-        font-size: 0.8rem;
         position: relative;
         overflow: hidden;
       }
-      .img-placeholder img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+      
+      /* Code/Data Styling */
+      .code-block {
+          font-family: 'Monaco', 'Consolas', monospace;
+          background: rgba(0,0,0,0.03);
+          border: 1px solid var(--border);
+          border-radius: 0.5rem;
       }
-
-      /* Data Table Styling */
-      .data-table-wrapper {
-        overflow-x: auto;
-      }
-      .data-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .data-table th,
-      .data-table td {
-        padding: 12px 16px;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-      }
-      .data-table th {
-        font-weight: 600;
-        color: var(--foreground);
-        background-color: var(--secondary);
-      }
-      .data-table tr:last-child td {
-        border-bottom: none;
-      }
-
-      .gradient-bg {
-        background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-        background-size: 200% 200%;
-        animation: gradientBG 5s ease infinite;
-      }
-
-      @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+      .dark .code-block {
+          background: rgba(255,255,255,0.05);
       }
     </style>
   </head>
-  <body class="antialiased min-h-screen flex flex-col">
+  <body class="antialiased min-h-screen flex flex-col selection:bg-primary/20 selection:text-primary">
     
-    <!-- Navbar -->
-    <nav class="fixed top-0 w-full z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-      <div class="container mx-auto px-4 h-16 flex justify-between items-center">
+    <!-- Backgrounds -->
+    <div class="bg-grid"></div>
+    <div class="blob-bg top-[-10%] left-[-10%]"></div>
+    <div class="blob-bg bottom-[10%] right-[-10%] bg-blue-500/20"></div>
+
+    <!-- Navbar (Fixed & Mobile Supported) -->
+    <nav class="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-xl">
+      <div class="container mx-auto px-4 lg:px-6 h-16 flex justify-between items-center">
         <!-- Logo -->
-        <a href="/" class="flex items-center gap-2 group">
-          <div class="w-8 h-8 rounded-lg gradient-bg text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-          </div>
-          <span class="font-bold text-lg tracking-tight">YT Finder</span>
+        <a href="/" class="flex items-center gap-2.5 font-bold text-lg tracking-tight group">
+            <img src="./logo.png" alt="" class="w-44">
         </a>
 
         <!-- Desktop Menu -->
-        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <a href="#features" class="hover:text-foreground transition-colors">Features</a>
-          <a href="/first-comment.html" class="hover:text-foreground transition-colors">First Comment</a>
-          <a href="/ai-analysis.html" class="hover:text-foreground transition-colors">AI Analysis</a>
-          <a href="/export-data.html" class="hover:text-foreground transition-colors">Export</a>
-          <a href="/blog/comment-history.html" class="hover:text-foreground transition-colors">Comment History</a>
+        <div class="hidden md:flex items-center gap-1 bg-secondary/50 p-1 rounded-full border border-white/5">
+            <a href="/" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Home</a>
+            <a href="/first-comment.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">First Comment</a>
+            <a href="/blog/comment-history.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Blog</a>
+            <a href="/ai-analysis.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">AI Analysis</a>
+            <a href="/export-data.html" class="px-4 py-1.5 text-sm font-medium text-foreground bg-background shadow-sm rounded-full transition-all">Export</a>
+            <a href="/privacy.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Privacy</a>
+            <a href="/terms.html" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Terms</a>
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center gap-4">
-          <button id="theme-toggle" class="p-2 rounded-md hover:bg-muted text-muted-foreground transition-colors">
-            <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
-            <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+        <div class="flex items-center gap-3">
+          <button id="theme-toggle" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary text-muted-foreground transition-colors">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
           </button>
           
-          <a href="#search" class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium gradient-bg text-white shadow hover:opacity-90 transition-opacity">
+          <a href="/index.html" class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-full text-sm font-semibold bg-primary text-white shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all">
             Get Started
           </a>
+
+          <!-- Mobile Menu Button -->
+          <button class="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors" onclick="toggleMobileMenu()">
+              <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
         </div>
+      </div>
+
+      <!-- Mobile Menu Dropdown -->
+      <div id="mobileMenu" class="hidden md:hidden absolute top-16 left-0 w-full bg-background border-b border-border shadow-2xl p-4 flex flex-col gap-2 z-50 animate-fade-in-up">
+          <a href="/" class="px-4 py-3 text-sm font-bold text-primary bg-primary/5 rounded-lg">Search</a>
+          <a href="/first-comment.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">First comment</a>
+          <a href="/blog/comment-history.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Comment History</a>
+          <a href="/ai-analysis.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">AI Analysis</a>
+          <a href="/export-data.html" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Export</a>
       </div>
     </nav>
 
-    <main class="flex-grow pt-16">
+    <main class="flex-grow pt-28 pb-12">
       
       <!-- Hero Section -->
-      <section class="section-padding relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-background pointer-events-none"></div>
+      <section class="container mx-auto px-4 text-center mb-24 animate-fade-in-up">
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+            The Only Way to Export <br class="hidden md:block" />
+            <span class="text-primary">YouTube Comments Data</span>
+        </h1>
         
-        <div class="container mx-auto px-4 relative max-w-4xl text-center animate-fade-in">
-            <h1 class="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-                The Only Way to Export YouTube Comments <br class="hidden md:block" />
-                <span class="text-primary">Data for Analysis</span>
-            </h1>
-            
-            <p class="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-                Stop wasting hours on data cleaning. Get high-fidelity, structured comment data ready for immediate import into Tableau, R, or Excel.
-            </p>
+        <p class="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+            Stop wasting hours on data cleaning. Get high-fidelity, structured comment data ready for immediate import into Tableau, R, or Excel.
+        </p>
 
-            <!-- Preview Module -->
-            <div class="max-w-3xl mx-auto bg-card rounded-xl border border-border p-6 shadow-sm mb-10">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-foreground">Preview: Structured Data Fields</h3>
-                    <span class="text-xs text-muted-foreground">Sample from a 10K comment dataset</span>
+        <!-- Preview Module (Styled as a Glass Dashboard) -->
+        <div class="max-w-4xl mx-auto glass-card overflow-hidden shadow-glow">
+            <div class="flex items-center justify-between p-4 border-b border-border/50 bg-secondary/30">
+                <div class="flex items-center gap-2">
+                    <div class="flex gap-1.5">
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                    </div>
+                    <span class="ml-2 text-xs font-mono text-muted-foreground">dataset_preview.csv</span>
                 </div>
-                
-                <div class="data-table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Comment Text</th>
-                                <th>Author ID</th>
-                                <th>Date</th>
-                                <th>Likes</th>
-                                <th>Sentiment</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-sm">This video is amazing! I learned so much about...</td>
-                                <td class="text-xs font-mono">UCX1234567890</td>
-                                <td class="text-xs">2025-01-15 14:32:45</td>
-                                <td>42</td>
-                                <td class="text-green-500">0.85</td>
-                            </tr>
-                            <tr>
-                                <td class="text-sm">I disagree with the point at 2:30. I think...</td>
-                                <td class="text-xs font-mono">UCABCDEF123456</td>
-                                <td class="text-xs">2025-01-15 15:12:10</td>
-                                <td>18</td>
-                                <td class="text-yellow-500">0.12</td>
-                            </tr>
-                            <tr>
-                                <td class="text-sm">First! Can't wait to see what's in this video!</td>
-                                <td class="text-xs font-mono">UCGHIJKL789012</td>
-                                <td class="text-xs">2025-01-15 14:30:01</td>
-                                <td>5</td>
-                                <td class="text-green-500">0.65</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="mt-6 flex flex-wrap gap-3 justify-center">
-                    <button class="inline-flex items-center gap-2 text-sm text-foreground bg-primary hover:bg-primary/90 px-4 py-2 rounded-md transition-colors">
-                        <i data-lucide="download" class="w-4 h-4"></i> Export as CSV
-                    </button>
-                    <button class="inline-flex items-center gap-2 text-sm text-foreground bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-md transition-colors">
-                        <i data-lucide="file-json" class="w-4 h-4"></i> Export as JSON
-                    </button>
-                    <button class="inline-flex items-center gap-2 text-sm text-foreground bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-md transition-colors">
-                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export as Excel
-                    </button>
-                </div>
+                <span class="text-xs font-medium text-muted-foreground bg-background/50 px-2 py-1 rounded">10K Rows Loaded</span>
             </div>
             
-            <a href="/pricing" class="inline-flex items-center gap-2 h-12 px-8 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-secondary/20 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            <th class="p-4 border-b border-border/50">Comment Text</th>
+                            <th class="p-4 border-b border-border/50">Author ID</th>
+                            <th class="p-4 border-b border-border/50">Date (UTC)</th>
+                            <th class="p-4 border-b border-border/50">Likes</th>
+                            <th class="p-4 border-b border-border/50">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border/30">
+                        <tr class="hover:bg-primary/5 transition-colors">
+                            <td class="p-4 max-w-xs truncate text-foreground/90">This video is amazing! I learned so much...</td>
+                            <td class="p-4 font-mono text-xs text-muted-foreground">UCX1234567890</td>
+                            <td class="p-4 text-xs tabular-nums text-muted-foreground">2025-01-15 14:32</td>
+                            <td class="p-4 font-medium text-foreground">42</td>
+                            <td class="p-4"><span class="px-2 py-0.5 rounded text-xs font-bold bg-green-500/10 text-green-600">0.85</span></td>
+                        </tr>
+                        <tr class="hover:bg-primary/5 transition-colors">
+                            <td class="p-4 max-w-xs truncate text-foreground/90">I disagree with the point at 2:30...</td>
+                            <td class="p-4 font-mono text-xs text-muted-foreground">UCABCDEF1234</td>
+                            <td class="p-4 text-xs tabular-nums text-muted-foreground">2025-01-15 15:12</td>
+                            <td class="p-4 font-medium text-foreground">18</td>
+                            <td class="p-4"><span class="px-2 py-0.5 rounded text-xs font-bold bg-yellow-500/10 text-yellow-600">0.12</span></td>
+                        </tr>
+                        <tr class="hover:bg-primary/5 transition-colors">
+                            <td class="p-4 max-w-xs truncate text-foreground/90">First! Can't wait to see...</td>
+                            <td class="p-4 font-mono text-xs text-muted-foreground">UCGHIJKL7890</td>
+                            <td class="p-4 text-xs tabular-nums text-muted-foreground">2025-01-15 14:30</td>
+                            <td class="p-4 font-medium text-foreground">5</td>
+                            <td class="p-4"><span class="px-2 py-0.5 rounded text-xs font-bold bg-green-500/10 text-green-600">0.65</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="p-6 bg-secondary/10 flex flex-wrap gap-4 justify-center border-t border-border/50">
+                <button class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition-all shadow-md hover:shadow-primary/25">
+                    <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+                </button>
+                <button class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-background border border-border hover:border-primary/50 hover:text-primary transition-all font-medium">
+                    <i data-lucide="file-json" class="w-4 h-4"></i> Export JSON
+                </button>
+                <button class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-background border border-border hover:border-green-500/50 hover:text-green-600 transition-all font-medium">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Excel (.xlsx)
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-10">
+            <a href="/pricing" class="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-gradient-to-r from-primary to-indigo-600 text-white font-semibold hover:opacity-90 transition-all shadow-lg">
                 <i data-lucide="lock" class="w-4 h-4"></i> Get Your Structured Data Now (Pro Feature)
             </a>
         </div>
       </section>
 
       <!-- Why Manual Fails -->
-      <section class="section-padding bg-background">
-          <div class="container mx-auto px-4 max-w-3xl">
-              <h2 class="text-3xl font-bold text-foreground mb-6 text-center">Why You Can't Rely on Manual Export or Basic Scrapers</h2>
-              <p class="text-muted-foreground mb-8 text-lg text-center">
-                  Manual scraping results in messy, incomplete, and non-uniform data. For serious market research or academic study, you need guaranteed data fidelity and crucial metadata that manual methods simply miss.
-              </p>
-              
-              <div class="bg-secondary/30 rounded-xl p-6 border border-border">
-                  <div class="flex items-start gap-4">
-                      <div class="w-10 h-10 rounded-lg bg-primary-10 flex items-center justify-center flex-shrink-0 mt-1">
-                          <i data-lucide="quote" class="w-5 h-5 text-primary"></i>
-                      </div>
-                      <div>
-                          <p class="text-foreground font-medium mb-2">Expert Experience</p>
-                          <p class="text-sm text-muted-foreground leading-relaxed">
-                              "As a full-time data analyst, my biggest fear is data cleaning. The CSV exported by this tool is the cleanest on the market. It imports directly into Tableau or R, saving me <strong>40%</strong> of my data preprocessing time."
-                          </p>
-                      </div>
-                  </div>
+      <section class="container mx-auto px-4 mb-24">
+          <div class="max-w-3xl mx-auto text-center mb-12">
+              <h2 class="text-3xl font-bold mb-4">Why Manual Scraping Fails</h2>
+              <p class="text-muted-foreground text-lg">For serious market research or academic study, you need guaranteed data fidelity and metadata that manual copy-pasting simply misses.</p>
+          </div>
+          
+          <div class="glass-card p-8 md:p-10 max-w-3xl mx-auto flex gap-6 items-start">
+              <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="quote" class="w-6 h-6"></i>
+              </div>
+              <div>
+                  <h3 class="text-lg font-bold mb-2">Expert Experience</h3>
+                  <p class="text-muted-foreground leading-relaxed italic">
+                      "As a full-time data analyst, my biggest fear is data cleaning. The CSV exported by this tool is the cleanest on the market. It imports directly into Tableau or R, saving me <strong>40%</strong> of my data preprocessing time."
+                  </p>
               </div>
           </div>
       </section>
 
       <!-- Export Formats -->
-      <section class="section-padding bg-secondary/50 border-y border-border">
-          <div class="container mx-auto px-4">
-              <div class="text-center mb-12">
-                  <h2 class="text-3xl font-bold text-foreground mb-4">Structured Export Formats</h2>
-                  <p class="text-muted-foreground">CSV, JSON, and Direct-to-Excel</p>
+      <section id="features" class="container mx-auto px-4 mb-24">
+          <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold mb-4">Structured Export Formats</h2>
+              <p class="text-muted-foreground">CSV, JSON, and Direct-to-Excel</p>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-6">
+              <!-- CSV -->
+              <div class="glass-card p-6 flex flex-col">
+                  <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center mb-4">
+                      <i data-lucide="file-text" class="w-6 h-6"></i>
+                  </div>
+                  <h3 class="text-lg font-bold mb-2">CSV (Spreadsheets)</h3>
+                  <p class="text-sm text-muted-foreground mb-4 flex-grow">
+                      Perfect for analysts using Excel, Sheets, or SPSS. Fully sanitized and delimited.
+                  </p>
+                  <div class="code-block p-3 text-[10px] text-muted-foreground leading-relaxed overflow-hidden">
+                      comment_text,author_id,likes<br>
+                      "Great video!",UC123,42<br>
+                      "Insightful",UC456,15
+                  </div>
               </div>
 
-              <div class="grid md:grid-cols-3 gap-8">
-                  <!-- CSV -->
-                  <div class="bg-card rounded-xl border border-border p-6 card-hover">
-                      <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                          <i data-lucide="file-text" class="w-6 h-6"></i>
-                      </div>
-                      <h3 class="text-xl font-semibold text-foreground mb-2">CSV (For Spreadsheets)</h3>
-                      <p class="text-muted-foreground mb-4">
-                          Perfect for analysts using Excel, Google Sheets, or basic statistics software. Fully sanitized and delimited.
-                      </p>
-                      <div class="text-xs font-mono bg-secondary p-3 rounded">
-                          comment_text,author_id,timestamp,likes,sentiment<br>
-                          "Great video!",UC123456,2025-01-15T14:32:45Z,42,0.85
-                      </div>
+              <!-- JSON -->
+              <div class="glass-card p-6 flex flex-col">
+                  <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center mb-4">
+                      <i data-lucide="file-json" class="w-6 h-6"></i>
                   </div>
-
-                  <!-- JSON -->
-                  <div class="bg-card rounded-xl border border-border p-6 card-hover">
-                      <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                          <i data-lucide="file-json" class="w-6 h-6"></i>
-                      </div>
-                      <h3 class="text-xl font-semibold text-foreground mb-2">JSON (For Developers)</h3>
-                      <p class="text-muted-foreground mb-4">
-                          Ideal for integration into custom apps, data pipelines, or advanced back-end analysis tools.
-                      </p>
-                      <div class="text-xs font-mono bg-secondary p-3 rounded">
-                          {<br>
-                          &nbsp;&nbsp;"text": "Great video!",<br>
-                          &nbsp;&nbsp;"author": "UC123456",<br>
-                          &nbsp;&nbsp;"timestamp": "2025-01-15T14:32:45Z"<br>
-                          }
-                      </div>
+                  <h3 class="text-lg font-bold mb-2">JSON (Developers)</h3>
+                  <p class="text-sm text-muted-foreground mb-4 flex-grow">
+                      Ideal for integration into custom apps, data pipelines, or Python/Pandas workflows.
+                  </p>
+                  <div class="code-block p-3 text-[10px] text-muted-foreground leading-relaxed overflow-hidden">
+                      {<br>
+                      &nbsp;&nbsp;"text": "Great video!",<br>
+                      &nbsp;&nbsp;"author": "UC123",<br>
+                      &nbsp;&nbsp;"score": 0.85<br>
+                      }
                   </div>
+              </div>
 
-                  <!-- Excel -->
-                  <div class="bg-card rounded-xl border border-border p-6 card-hover">
-                      <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                          <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
-                      </div>
-                      <h3 class="text-xl font-semibold text-foreground mb-2">Direct-to-Excel (Premium)</h3>
-                      <p class="text-muted-foreground mb-4">
-                          Downloadable .xlsx file with pre-formatted columns and timestamps for immediate use.
-                      </p>
-                      <div class="text-xs bg-secondary p-3 rounded flex items-center justify-center">
-                          <i data-lucide="file-spreadsheet" class="w-8 h-8 text-primary"></i>
-                      </div>
+              <!-- Excel -->
+              <div class="glass-card p-6 flex flex-col">
+                  <div class="w-12 h-12 rounded-xl bg-green-500/10 text-green-600 flex items-center justify-center mb-4">
+                      <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+                  </div>
+                  <h3 class="text-lg font-bold mb-2">Direct-to-Excel</h3>
+                  <p class="text-sm text-muted-foreground mb-4 flex-grow">
+                      Premium downloadable .xlsx file with pre-formatted columns, filters, and timestamps.
+                  </p>
+                  <div class="flex-1 flex items-center justify-center bg-secondary/50 rounded-lg border border-border/50 h-20">
+                      <i data-lucide="sheet" class="w-8 h-8 text-green-600/50"></i>
                   </div>
               </div>
           </div>
       </section>
 
       <!-- Data Fidelity -->
-      <section class="section-padding bg-background">
-          <div class="container mx-auto px-4">
-              <h2 class="text-3xl font-bold text-foreground mb-12 text-center">Data Fidelity Guarantee: What Data Fields We Include</h2>
-              
-              <div class="data-table-wrapper mb-8">
-                  <table class="data-table">
+      <section class="container mx-auto px-4 mb-24">
+          <h2 class="text-3xl font-bold text-foreground mb-12 text-center">Data Fidelity: Included Fields</h2>
+          
+          <div class="glass-card overflow-hidden mb-12">
+              <div class="overflow-x-auto">
+                  <table class="w-full text-left text-sm">
                       <thead>
-                          <tr>
-                              <th>Field Name</th>
-                              <th>Description</th>
-                              <th>Analysis Value</th>
+                          <tr class="bg-secondary/50 border-b border-border/50">
+                              <th class="p-4 font-semibold text-foreground">Field Name</th>
+                              <th class="p-4 font-semibold text-foreground">Description</th>
+                              <th class="p-4 font-semibold text-foreground">Value</th>
                           </tr>
                       </thead>
-                      <tbody>
+                      <tbody class="divide-y divide-border/30">
                           <tr>
-                              <td>Comment Text</td>
-                              <td>The raw comment body.</td>
-                              <td>Content Analysis</td>
+                              <td class="p-4 font-medium">Comment Text</td>
+                              <td class="p-4 text-muted-foreground">The raw comment body.</td>
+                              <td class="p-4"><span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium">Content</span></td>
                           </tr>
                           <tr>
-                              <td><strong>AI Sentiment Score</strong></td>
-                              <td>NLP-generated score (-1.0 to 1.0). <a href="/ai-analysis" class="text-primary hover:underline">Learn about our AI analysis.</a></td>
-                              <td>Tonal Trend Mapping</td>
+                              <td class="p-4 font-medium">AI Sentiment</td>
+                              <td class="p-4 text-muted-foreground">NLP score (-1.0 to 1.0). <a href="/ai-analysis" class="text-primary hover:underline">Learn more.</a></td>
+                              <td class="p-4"><span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium">Trends</span></td>
                           </tr>
                           <tr>
-                              <td>Timestamp (UTC)</td>
-                              <td>Exact post time for longitudinal analysis.</td>
-                              <td>Engagement Timing</td>
+                              <td class="p-4 font-medium">Timestamp (UTC)</td>
+                              <td class="p-4 text-muted-foreground">Exact post time for longitudinal analysis.</td>
+                              <td class="p-4"><span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium">Timing</span></td>
                           </tr>
                           <tr>
-                              <td>Author Channel ID</td>
-                              <td>Unique user identifier. <a href="/user-search" class="text-primary hover:underline">Track full user history.</a></td>
-                              <td>User Profiling</td>
+                              <td class="p-4 font-medium">Author ID</td>
+                              <td class="p-4 text-muted-foreground">Unique identifier. <a href="/user-search" class="text-primary hover:underline">Track history.</a></td>
+                              <td class="p-4"><span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium">Profiling</span></td>
                           </tr>
                           <tr>
-                              <td>Like Count</td>
-                              <td>Number of likes received.</td>
-                              <td>Popularity Measurement</td>
-                          </tr>
-                          <tr>
-                              <td>Reply Count</td>
-                              <td>Number of replies to the comment.</td>
-                              <td>Engagement Depth</td>
-                          </tr>
-                          <tr>
-                              <td>Video ID</td>
-                              <td>Source video identifier.</td>
-                              <td>Cross-Video Analysis</td>
+                              <td class="p-4 font-medium">Metrics</td>
+                              <td class="p-4 text-muted-foreground">Likes & Reply Counts.</td>
+                              <td class="p-4"><span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium">Engagement</span></td>
                           </tr>
                       </tbody>
                   </table>
               </div>
-              
-              <div class="bg-secondary/30 rounded-xl p-6 border border-border max-w-3xl mx-auto">
-                  <div class="flex items-start gap-4">
-                      <div class="w-10 h-10 rounded-lg bg-primary-10 flex items-center justify-center flex-shrink-0 mt-1">
-                          <i data-lucide="bar-chart-4" class="w-5 h-5 text-primary"></i>
-                      </div>
-                      <div>
-                          <p class="text-foreground font-medium mb-2">Original Data Point</p>
-                          <p class="text-sm text-muted-foreground">
-                              Data Integrity Test: When exporting 500,000 comments, our data integrity (zero missing or duplicate records) achieved <strong>99.9%</strong>, significantly exceeding the 85% average of standard scrapers.
-                          </p>
-                      </div>
-                  </div>
+          </div>
+          
+          <div class="glass-card p-6 border-l-4 border-primary max-w-3xl mx-auto flex items-start gap-4">
+              <div class="mt-1">
+                  <i data-lucide="check-circle-2" class="w-6 h-6 text-primary"></i>
+              </div>
+              <div>
+                  <p class="font-bold text-foreground mb-1">99.9% Data Integrity</p>
+                  <p class="text-sm text-muted-foreground">
+                      When exporting 500,000 comments, our integrity test (zero missing/duplicate records) achieved <strong>99.9%</strong>, significantly exceeding standard scrapers (85%).
+                  </p>
               </div>
           </div>
       </section>
 
       <!-- Case Studies -->
-      <section class="section-padding bg-secondary/30">
-          <div class="container mx-auto px-4">
-              <h2 class="text-3xl font-bold text-foreground mb-12 text-center">Commercial Case Study: How Agencies Use Bulk Export</h2>
-              
-              <div class="grid md:grid-cols-3 gap-8">
-                  <!-- Case 1 -->
-                  <div class="bg-card rounded-xl border border-border p-6 card-hover">
-                      <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                          <i data-lucide="bug" class="w-6 h-6"></i>
-                      </div>
-                      <h3 class="text-lg font-semibold text-foreground mb-2">Product Feedback Loop</h3>
-                      <p class="text-muted-foreground mb-4">
-                          A major electronics brand used bulk export to run word-frequency analysis on 1M comments, rapidly identifying a critical bug mentioned by users.
-                      </p>
+      <section class="container mx-auto px-4 mb-24">
+          <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold mb-4">Commercial Use Cases</h2>
+              <p class="text-muted-foreground">How agencies use bulk export.</p>
+          </div>
+          
+          <div class="grid md:grid-cols-3 gap-6">
+              <!-- Case 1 -->
+              <div class="glass-card p-6">
+                  <div class="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-600 flex items-center justify-center mb-4">
+                      <i data-lucide="bug" class="w-5 h-5"></i>
                   </div>
+                  <h3 class="font-bold text-foreground mb-2">Product Feedback</h3>
+                  <p class="text-sm text-muted-foreground leading-relaxed">
+                      A brand analyzed 1M comments to identify a critical bug mentioned by users, fixing it before launch.
+                  </p>
+              </div>
 
-                  <!-- Case 2 -->
-                  <div class="bg-card rounded-xl border border-border p-6 card-hover">
-                      <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                          <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
-                      </div>
-                      <h3 class="text-lg font-semibold text-foreground mb-2">Competitive Sentiment Mapping</h3>
-                      <p class="text-muted-foreground mb-4">
-                          An advertising agency exported data from 100 competitor videos to build a sentiment map, identifying core weaknesses in the rival's marketing.
-                      </p>
+              <!-- Case 2 -->
+              <div class="glass-card p-6">
+                  <div class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-600 flex items-center justify-center mb-4">
+                      <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
                   </div>
+                  <h3 class="font-bold text-foreground mb-2">Competitor Mapping</h3>
+                  <p class="text-sm text-muted-foreground leading-relaxed">
+                      An ad agency exported data from 100 competitor videos to build a sentiment map of rival weaknesses.
+                  </p>
+              </div>
 
-                  <!-- Case 3 -->
-                  <div class="bg-card rounded-xl border border-border p-6 card-hover">
-                      <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                          <i data-lucide="shield-alert" class="w-6 h-6"></i>
-                      </div>
-                      <h3 class="text-lg font-semibold text-foreground mb-2">Crisis Monitoring</h3>
-                      <p class="text-muted-foreground mb-4">
-                          A top PR firm used our tool to export 100 videos of a competitor and found consumers' negative sentiment on a specific feature was much higher than anticipated.
-                      </p>
+              <!-- Case 3 -->
+              <div class="glass-card p-6">
+                  <div class="w-10 h-10 rounded-lg bg-red-500/10 text-red-600 flex items-center justify-center mb-4">
+                      <i data-lucide="shield-alert" class="w-5 h-5"></i>
                   </div>
+                  <h3 class="font-bold text-foreground mb-2">Crisis Monitoring</h3>
+                  <p class="text-sm text-muted-foreground leading-relaxed">
+                      A PR firm used our tool to find that negative sentiment on a specific feature was higher than anticipated.
+                  </p>
               </div>
           </div>
       </section>
 
       <!-- Pricing -->
-      <section class="section-padding bg-background">
-          <div class="container mx-auto px-4 text-center">
-              <h2 class="text-3xl font-bold text-foreground mb-4">Pricing and Bulk Data Tiers</h2>
-              <p class="text-muted-foreground mb-12 max-w-2xl mx-auto">
-                  Choose the plan that fits your research needs, from small-scale analysis to enterprise-level data projects.
-              </p>
+      <section class="container mx-auto px-4 mb-24 text-center">
+          <h2 class="text-3xl font-bold text-foreground mb-4">Pricing and Bulk Data Tiers</h2>
+          <p class="text-muted-foreground mb-12 max-w-2xl mx-auto">
+              Choose the plan that fits your research needs, from small-scale analysis to enterprise-level data projects.
+          </p>
+          
+          <!-- <div class="img-placeholder glass-card border-none h-64 mb-10 max-w-4xl mx-auto">
+              <i data-lucide="image" class="w-12 h-12 mb-4 text-primary/40"></i>
+          </div> -->
+          
+          <a href="/pricing" class="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition-all shadow-md">
+              <i data-lucide="layout-list" class="w-4 h-4"></i> Try Our Tools
+          </a>
+      </section>
+
+      <!-- FAQ & Security -->
+      <section class="container mx-auto px-4 max-w-3xl mb-24">
+          <h2 class="text-2xl font-bold mb-8 text-center">Data Security & FAQ</h2>
+          <p class="text-center text-muted-foreground mb-10 text-sm">
+              We prioritize your security and adhere to global data compliance standards. We only process publicly available comment data.
+          </p>
+          
+          <div class="space-y-4">
+              <details class="glass-card px-6 py-4 group cursor-pointer">
+                  <summary class="font-medium list-none flex items-center justify-between">
+                      <span>Is the data processed securely?</span>
+                      <i data-lucide="chevron-down" class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180"></i>
+                  </summary>
+                  <p class="mt-3 text-sm text-muted-foreground leading-relaxed">
+                      Yes. All data processing and export functions are executed over SSL/TLS, ensuring end-to-end encryption.
+                  </p>
+              </details>
               
-              <div class="img-placeholder h-48 md:h-64 mb-10 mx-auto max-w-4xl">
-                  <img src="" alt="" class="hidden" />
-                  <i data-lucide="image" class="w-10 h-10 mb-2 opacity-50"></i>
-                  <span>Pricing Tiers Comparison Chart</span>
-              </div>
-              
-              <a href="/pricing" class="inline-flex items-center gap-2 h-12 px-8 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-sm">
-                  <i data-lucide="layout-list" class="w-4 h-4"></i> View Detailed Pricing Plans
-              </a>
+              <details class="glass-card px-6 py-4 group cursor-pointer">
+                  <summary class="font-medium list-none flex items-center justify-between">
+                      <span>Export limits per plan?</span>
+                      <i data-lucide="chevron-down" class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180"></i>
+                  </summary>
+                  <p class="mt-3 text-sm text-muted-foreground leading-relaxed">
+                      Limits are tiered based on your subscription. Enterprise plans offer virtually unlimited bulk export capabilities.
+                  </p>
+              </details>
+          </div>
+          
+          <div class="mt-10 text-center text-xs text-muted-foreground">
+              Latest Update: We currently support the latest YouTube short-form channel URLs. (Nov 2025)
           </div>
       </section>
 
-      <!-- FAQ -->
-      <section class="section-padding bg-secondary/50 border-y border-border">
-          <div class="container mx-auto px-4 max-w-3xl">
-              <h2 class="text-3xl font-bold text-foreground mb-8 text-center">Data Security, Compliance, and FAQ</h2>
-              <p class="text-muted-foreground text-center mb-10">
-                  We prioritize your security and adhere to global data compliance standards, including GDPR. We only process publicly available comment data.
-              </p>
-              
-              <div class="space-y-4">
-                  <details class="bg-card rounded-xl border border-border p-5 group">
-                      <summary class="font-semibold text-foreground cursor-pointer list-none flex items-center justify-between">
-                          Is the data processed securely?
-                          <i data-lucide="chevron-down" class="w-5 h-5 text-muted-foreground group-open:rotate-180 transition-transform"></i>
-                      </summary>
-                      <p class="mt-3 text-muted-foreground">
-                          Yes. All data processing and export functions are executed over SSL/TLS, ensuring end-to-end encryption.
-                      </p>
-                  </details>
-                  
-                  <details class="bg-card rounded-xl border border-border p-5 group">
-                      <summary class="font-semibold text-foreground cursor-pointer list-none flex items-center justify-between">
-                          Are there any limits on the number of comments I can export?
-                          <i data-lucide="chevron-down" class="w-5 h-5 text-muted-foreground group-open:rotate-180 transition-transform"></i>
-                      </summary>
-                      <p class="mt-3 text-muted-foreground">
-                          Limits are tiered based on your subscription plan. Enterprise plans offer virtually unlimited bulk export capabilities.
-                      </p>
-                  </details>
-              </div>
-              
-              <div class="mt-10 text-center text-sm text-muted-foreground">
-                  Latest Update: We currently support the latest YouTube short-form channel URLs for tracking. (Last Updated: Nov 2025)
-              </div>
-          </div>
-      </section>
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-border bg-card">
-      <div class="container mx-auto px-4 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <a href="/" class="flex items-center gap-2 mb-4">
-              <div class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-                <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+    <footer class="border-t border-border/50 bg-background/50 py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-12">
+          <div class="col-span-1 md:col-span-2">
+            <a href="/" class="flex items-center gap-2 mb-6 font-bold text-xl">
+              <div class="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center">
+                 <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
               </div>
-              <span class="font-bold text-lg">YT Finder</span>
+              YT Finder
             </a>
-            <p class="text-muted-foreground text-sm mb-4">
-              The fastest way to search, analyze, and export YouTube comments.
+            <p class="text-sm text-muted-foreground leading-relaxed max-w-sm mb-6">
+              The professional standard for YouTube comment analysis and data extraction. Built for creators, marketers, and data analysts.
             </p>
-            <div class="flex gap-3">
-              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <i data-lucide="twitter" class="w-4 h-4"></i>
-              </a>
-              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <i data-lucide="github" class="w-4 h-4"></i>
-              </a>
-              <a href="#" class="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <i data-lucide="linkedin" class="w-4 h-4"></i>
-              </a>
+            <div class="flex gap-4">
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+                <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
             </div>
           </div>
           
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Product</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/" class="hover:text-foreground transition-colors">Search</a></li>
-              <li><a href="/viewer" class="hover:text-foreground transition-colors">Viewer</a></li>
-              <li><a href="/ai-analysis" class="hover:text-foreground transition-colors">AI Analysis</a></li>
-              <li><a href="/export-data" class="hover:text-foreground transition-colors">Export</a></li>
-              <li><a href="/first-comment" class="hover:text-foreground transition-colors">First Comment</a></li>
-              <li><a href="/user-search" class="hover:text-foreground transition-colors">User Search</a></li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Product</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/" class="hover:text-primary transition-colors">Search</a></li>
+              <li><a href="/ai-analysis.html" class="hover:text-primary transition-colors">AI Analysis</a></li>
+              <li><a href="/export-data.html" class="hover:text-primary transition-colors">Export</a></li>
+              <li><a href="/ai-analysis.html" class="hover:text-primary transition-colors">AI Analysis</a></li>
+              <li><a href="/first-comment.html" class="hover:text-primary transition-colors">First Comment</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Resources</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/blog" class="hover:text-foreground transition-colors">Blog</a></li>
-              <li><a href="/docs" class="hover:text-foreground transition-colors">Documentation</a></li>
-              <li><a href="/api" class="hover:text-foreground transition-colors">API</a></li>
-              <li><a href="/support" class="hover:text-foreground transition-colors">Support</a></li>
-              <li><a href="/changelog" class="hover:text-foreground transition-colors">Changelog</a></li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Resources</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/blog/comment-history.html" class="hover:text-primary transition-colors">Blog</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 class="font-semibold text-foreground mb-4">Legal</h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/privacy" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
-              <li><a href="/terms" class="hover:text-foreground transition-colors">Terms of Service</a></li>
-              <li><a href="/cookies" class="hover:text-foreground transition-colors">Cookie Policy</a></li>
-              <li><a href="/contact" class="hover:text-foreground transition-colors">Contact Us</a></li>
+            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">Legal</h3>
+            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a href="/privacy.html" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms.html" class="hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><a href="/about.html" class="hover:text-primary transition-colors">About Us</a></li>
             </ul>
           </div>
         </div>
         
-        <div class="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>© 2025 YT Comment Finder. This site is not affiliated with YouTube or Google.</p>
+        <div class="pt-8 border-t border-border/50 mt-12 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+          <p>© 2025 YT Comment Finder. All rights reserved.</p>
+          <div class="flex items-center gap-6 mt-4 md:mt-0">
+             <p>Not affiliated with Google LLC.</p>
+             <div class="flex items-center gap-2">
+                 <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                 <span>All Systems Normal</span>
+             </div>
+          </div>
         </div>
       </div>
     </footer>
@@ -650,6 +646,12 @@
           localStorage.theme = "dark";
         }
       });
+
+      // Mobile Menu Toggle
+      function toggleMobileMenu() {
+          const menu = document.getElementById('mobileMenu');
+          menu.classList.toggle('hidden');
+      }
     </script>
   </body>
 </html>

@@ -263,13 +263,23 @@
 
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center gap-1 bg-secondary/50 p-1 rounded-full border border-white/5">
-            <a href="/" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Home</a>
+            <a href="/" class="px-4 py-1.5 text-sm font-medium text-foreground bg-background shadow-sm rounded-full transition-all">Home</a>
             <a href="/first-comment" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">First Comment</a>
-            <a href="/blog/comment-history" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Blog</a>
+            <div class="relative group">
+                <button class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all flex items-center gap-1">
+                    Blog <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                </button>
+                <div class="absolute top-full left-0 mt-2 w-56 bg-background border border-border rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div class="p-2">
+                        <a href="/blog/comment-history" class="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors">Comment History Guide</a>
+                        <a href="/blog/find-my-youtube-comments" class="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors">Find My Comments</a>
+                    </div>
+                </div>
+            </div>
             <a href="/ai-analysis" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">AI Analysis</a>
             <a href="/export-data" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Export</a>
             <a href="/privacy" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Privacy</a>
-            <a href="/terms" class="px-4 py-1.5 text-sm font-medium text-foreground bg-background shadow-sm rounded-full transition-all">Terms</a>
+            <a href="/terms" class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Terms</a>
         </div>
 
         <!-- Actions -->
@@ -294,7 +304,9 @@
       <div id="mobileMenu" class="hidden md:hidden absolute top-16 left-0 w-full bg-background border-b border-border shadow-2xl p-4 flex flex-col gap-2 z-50 animate-fade-in-up">
           <a href="/" class="px-4 py-3 text-sm font-bold text-primary bg-primary/5 rounded-lg">Search</a>
           <a href="/first-comment" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">First comment</a>
-          <a href="/blog/comment-history" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Comment History</a>
+          <div class="px-4 py-2 text-sm font-medium text-muted-foreground">Blog</div>
+          <a href="/blog/comment-history" class="px-6 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Comment History</a>
+          <a href="/blog/find-my-youtube-comments" class="px-6 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Find My Comments</a>
           <a href="/ai-analysis" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">AI Analysis</a>
           <a href="/export-data" class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Export</a>
       </div>

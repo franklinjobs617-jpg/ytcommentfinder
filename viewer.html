@@ -1,1556 +1,1338 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="upgrade-insecure-requests"
-    />
-    <title>YT Comment Viewer: Real-time Analysis Console</title>
-    <meta
-      name="description"
-      content="The ultimate YouTube Comment Viewer. Load, sort, and read millions of comments without browser lag."
-    />
-    <link rel="canonical" href="https://www.ytcommentfinder.com/viewer" />
 
-    <!-- Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-N8KJTLNYJ2"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+  <title>YT Comment Viewer: Real-time Analysis Console</title>
+  <meta name="description"
+    content="The ultimate YouTube Comment Viewer. Load, sort, and read millions of comments without browser lag." />
+  <link rel="canonical" href="https://www.ytcommentfinder.com/viewer" />
 
-      gtag("config", "G-N8KJTLNYJ2");
-    </script>
-    <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "ui3yhf95cl");
+  <!-- Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-N8KJTLNYJ2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-N8KJTLNYJ2");
   </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-    <script src="./js/comment-manager.js"></script>
+  <script type="text/javascript">
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+      t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, "clarity", "script", "ui3yhf95cl");
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="./js/comment-manager.js"></script>
 
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['"Inter"', "sans-serif"],
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', "sans-serif"],
+          },
+          colors: {
+            border: "var(--border)",
+            input: "var(--input)",
+            background: "var(--background)",
+            foreground: "var(--foreground)",
+            primary: {
+              DEFAULT: "var(--primary)",
+              foreground: "var(--primary-foreground)",
+              glow: "var(--primary-glow)",
             },
-            colors: {
-              border: "var(--border)",
-              input: "var(--input)",
-              background: "var(--background)",
-              foreground: "var(--foreground)",
-              primary: {
-                DEFAULT: "var(--primary)",
-                foreground: "var(--primary-foreground)",
-                glow: "var(--primary-glow)",
-              },
-              secondary: {
-                DEFAULT: "var(--secondary)",
-                foreground: "var(--secondary-foreground)",
-              },
-              muted: {
-                DEFAULT: "var(--muted)",
-                foreground: "var(--muted-foreground)",
-              },
-              card: {
-                DEFAULT: "var(--card)",
-                foreground: "var(--card-foreground)",
-              },
+            secondary: {
+              DEFAULT: "var(--secondary)",
+              foreground: "var(--secondary-foreground)",
             },
-            backgroundImage: {
-              "dot-pattern":
-                "radial-gradient(var(--dot-color) 1px, transparent 1px)",
+            muted: {
+              DEFAULT: "var(--muted)",
+              foreground: "var(--muted-foreground)",
             },
-            boxShadow: {
-              glow: "0 0 40px -10px var(--primary-glow)",
-              glass: "0 8px 32px 0 rgba(31, 38, 135, 0.07)",
-              up: "0 -4px 20px -5px rgba(0, 0, 0, 0.1)",
+            card: {
+              DEFAULT: "var(--card)",
+              foreground: "var(--card-foreground)",
             },
-            animation: {
-              "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-              "slide-up": "slideUp 0.3s ease-out forwards",
-            },
-            keyframes: {
-              slideUp: {
-                "0%": { transform: "translateY(20px)", opacity: "0" },
-                "100%": { transform: "translateY(0)", opacity: "1" },
-              },
+          },
+          backgroundImage: {
+            "dot-pattern":
+              "radial-gradient(var(--dot-color) 1px, transparent 1px)",
+          },
+          boxShadow: {
+            glow: "0 0 40px -10px var(--primary-glow)",
+            glass: "0 8px 32px 0 rgba(31, 38, 135, 0.07)",
+            up: "0 -4px 20px -5px rgba(0, 0, 0, 0.1)",
+          },
+          animation: {
+            "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+            "slide-up": "slideUp 0.3s ease-out forwards",
+          },
+          keyframes: {
+            slideUp: {
+              "0%": { transform: "translateY(20px)", opacity: "0" },
+              "100%": { transform: "translateY(0)", opacity: "1" },
             },
           },
         },
-      };
-    </script>
-    <style>
-      :root {
-        /* Light Mode */
-        --background: #ffffff;
-        --foreground: #0f172a;
+      },
+    };
+  </script>
+  <style>
+    :root {
+      /* Light Mode */
+      --background: #ffffff;
+      --foreground: #0f172a;
 
-        --card: rgba(255, 255, 255, 0.9);
-        --card-foreground: #0f172a;
+      --card: rgba(255, 255, 255, 0.9);
+      --card-foreground: #0f172a;
 
-        --primary: #4f46e5;
-        --primary-foreground: #ffffff;
-        --primary-glow: rgba(79, 70, 229, 0.3);
+      --primary: #4f46e5;
+      --primary-foreground: #ffffff;
+      --primary-glow: rgba(79, 70, 229, 0.3);
 
-        --secondary: #f8fafc;
-        --secondary-foreground: #0f172a;
+      --secondary: #f8fafc;
+      --secondary-foreground: #0f172a;
 
-        --muted: #f1f5f9;
-        --muted-foreground: #64748b;
+      --muted: #f1f5f9;
+      --muted-foreground: #64748b;
 
-        --border: #e2e8f0;
-        --input: #f1f5f9;
+      --border: #e2e8f0;
+      --input: #f1f5f9;
 
-        --dot-color: #cbd5e1;
-        --radius: 1rem;
-      }
+      --dot-color: #cbd5e1;
+      --radius: 1rem;
+    }
 
-      .dark {
-        /* Dark Mode */
-        --background: #09090b;
-        --foreground: #fafafa;
+    .dark {
+      /* Dark Mode */
+      --background: #09090b;
+      --foreground: #fafafa;
 
-        --card: rgba(24, 24, 27, 0.8);
-        --card-foreground: #fafafa;
+      --card: rgba(24, 24, 27, 0.8);
+      --card-foreground: #fafafa;
 
-        --primary: #6366f1;
-        --primary-foreground: #ffffff;
-        --primary-glow: rgba(99, 102, 241, 0.2);
+      --primary: #6366f1;
+      --primary-foreground: #ffffff;
+      --primary-glow: rgba(99, 102, 241, 0.2);
 
-        --secondary: #27272a;
-        --secondary-foreground: #fafafa;
+      --secondary: #27272a;
+      --secondary-foreground: #fafafa;
 
-        --muted: #18181b;
-        --muted-foreground: #a1a1aa;
+      --muted: #18181b;
+      --muted-foreground: #a1a1aa;
 
-        --border: #27272a;
-        --input: #18181b;
+      --border: #27272a;
+      --input: #18181b;
 
-        --dot-color: #27272a;
-      }
+      --dot-color: #27272a;
+    }
 
-      body {
-        background-color: var(--background);
-        color: var(--foreground);
-        font-family: "Inter", sans-serif;
-        overflow-x: hidden;
-      }
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      font-family: "Inter", sans-serif;
+      overflow-x: hidden;
+    }
 
-      /* Background Effects */
-      .bg-grid {
-        background-size: 40px 40px;
-        background-image: var(--dot-pattern);
-        mask-image: linear-gradient(
-          to bottom,
+    /* Background Effects */
+    .bg-grid {
+      background-size: 40px 40px;
+      background-image: var(--dot-pattern);
+      mask-image: linear-gradient(to bottom,
           transparent,
           5% black,
           90% black,
-          transparent
-        );
-        -webkit-mask-image: linear-gradient(
-          to bottom,
+          transparent);
+      -webkit-mask-image: linear-gradient(to bottom,
           transparent,
           5% black,
           90% black,
-          transparent
-        );
-        opacity: 0.4;
-        position: fixed;
-        inset: 0;
-        z-index: -1;
-      }
+          transparent);
+      opacity: 0.4;
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+    }
 
-      .blob-bg {
-        position: fixed;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
-        opacity: 0.12;
-        filter: blur(80px);
-        z-index: -1;
-        pointer-events: none;
-      }
+    .blob-bg {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+      opacity: 0.12;
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+    }
 
-      /* Glass Cards */
-      .glass-card {
-        background: var(--card);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--glass);
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
+    /* Glass Cards */
+    .glass-card {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--glass);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
 
-      .comment-card {
-        padding: 1.25rem;
-        background: var(--background);
-        border: 1px solid transparent;
-        border-radius: 0.75rem;
-        transition: all 0.2s;
-      }
-      .dark .comment-card {
-        background: rgba(255, 255, 255, 0.03);
-      }
-      .comment-card:hover {
-        background: var(--secondary);
-        border-color: var(--border);
-      }
+    .comment-card {
+      padding: 1.25rem;
+      background: var(--background);
+      border: 1px solid transparent;
+      border-radius: 0.75rem;
+      transition: all 0.2s;
+    }
 
-      .custom-input {
-        background: var(--input);
-        border: 1px solid transparent;
-        border-radius: 0.5rem;
-        transition: all 0.2s;
-      }
-      .custom-input:focus {
-        outline: none;
-        background: var(--background);
-        border-color: var(--primary);
-        box-shadow: 0 0 0 2px var(--primary-glow);
-      }
+    .dark .comment-card {
+      background: rgba(255, 255, 255, 0.03);
+    }
 
-      /* Mobile Drawer Styles (Filter Panel) */
-      .mobile-drawer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--card);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        z-index: 100;
-        transform: translateY(110%);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        border-top: 1px solid var(--border);
-        border-radius: 1.5rem 1.5rem 0 0;
-        box-shadow: var(--up);
-      }
-      .mobile-drawer.open {
+    .comment-card:hover {
+      background: var(--secondary);
+      border-color: var(--border);
+    }
+
+    .custom-input {
+      background: var(--input);
+      border: 1px solid transparent;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .custom-input:focus {
+      outline: none;
+      background: var(--background);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-glow);
+    }
+
+    /* Mobile Drawer Styles (Filter Panel) */
+    .mobile-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+      transform: translateY(110%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-top: 1px solid var(--border);
+      border-radius: 1.5rem 1.5rem 0 0;
+      box-shadow: var(--up);
+    }
+
+    .mobile-drawer.open {
+      transform: translateY(0);
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: black;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 99;
+    }
+
+    .drawer-overlay.open {
+      opacity: 0.6;
+      pointer-events: auto;
+    }
+
+    /* Toast Notification */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+      width: max-content;
+      max-width: 90vw;
+    }
+
+    .toast {
+      background: var(--foreground);
+      color: var(--background);
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideUpFade 0.3s forwards;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @keyframes slideUpFade {
+      to {
+        opacity: 1;
         transform: translateY(0);
       }
-      .drawer-overlay {
-        position: fixed;
-        inset: 0;
-        background: black;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s;
-        z-index: 99;
-      }
-      .drawer-overlay.open {
-        opacity: 0.6;
-        pointer-events: auto;
-      }
+    }
+  </style>
+</head>
 
-      /* Toast Notification */
-      #toast-container {
-        position: fixed;
-        bottom: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        pointer-events: none;
-        width: max-content;
-        max-width: 90vw;
-      }
-      .toast {
-        background: var(--foreground);
-        color: var(--background);
-        padding: 10px 20px;
-        border-radius: 50px;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        opacity: 0;
-        transform: translateY(20px);
-        animation: slideUpFade 0.3s forwards;
-        text-align: center;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      @keyframes slideUpFade {
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    </style>
-  </head>
+<body class="antialiased min-h-screen flex flex-col selection:bg-primary/20 selection:text-primary pb-20 lg:pb-0">
+  <!-- Backgrounds -->
+  <div class="bg-grid"></div>
+  <div class="blob-bg top-[-10%] left-[-10%]"></div>
+  <div class="blob-bg bottom-[10%] right-[-10%] bg-purple-500/20"></div>
 
-  <body
-    class="antialiased min-h-screen flex flex-col selection:bg-primary/20 selection:text-primary pb-20 lg:pb-0"
-  >
-    <!-- Backgrounds -->
-    <div class="bg-grid"></div>
-    <div class="blob-bg top-[-10%] left-[-10%]"></div>
-    <div class="blob-bg bottom-[10%] right-[-10%] bg-purple-500/20"></div>
+  <div id="toast-container"></div>
 
-    <div id="toast-container"></div>
+  <div id="drawerOverlay" class="drawer-overlay" onclick="toggleMobileDrawer(false)"></div>
 
-    <div
-      id="drawerOverlay"
-      class="drawer-overlay"
-      onclick="toggleMobileDrawer(false)"
-    ></div>
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-xl">
+    <div class="container mx-auto px-4 lg:px-6 h-16 flex justify-between items-center">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2.5 font-bold text-lg tracking-tight group">
+        <img src="./logo.png" alt="" class="w-44" />
+      </a>
 
-    <!-- Navbar -->
-    <nav
-      class="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-xl"
-    >
-      <div
-        class="container mx-auto px-4 lg:px-6 h-16 flex justify-between items-center"
-      >
-        <!-- Logo -->
-        <a
-          href="/"
-          class="flex items-center gap-2.5 font-bold text-lg tracking-tight group"
-        >
-          <img src="./logo.png" alt="" class="w-44" />
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center gap-1 bg-secondary/50 p-1 rounded-full border border-white/5">
+        <a href="/"
+          class="px-4 py-1.5 text-sm font-medium text-foreground bg-background shadow-sm rounded-full transition-all">Home</a>
+        <a href="/first-comment"
+          class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">First
+          Comment</a>
+        <a href="/blog/comment-history"
+          class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Blog</a>
+        <a href="/ai-analysis"
+          class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">AI
+          Analysis</a>
+        <a href="/export-data"
+          class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Export</a>
+        <a href="/privacy"
+          class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Privacy</a>
+        <a href="/terms"
+          class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all">Terms</a>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3">
+        <button id="theme-toggle"
+          class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary text-muted-foreground transition-colors">
+          <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+          <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
+        </button>
+
+        <a href="/index"
+          class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-full text-sm font-semibold bg-primary text-white shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all">
+          Get Started
         </a>
 
-        <!-- Desktop Menu -->
-        <div
-          class="hidden md:flex items-center gap-1 bg-secondary/50 p-1 rounded-full border border-white/5"
-        >
-          <a
-            href="/"
-            class="px-4 py-1.5 text-sm font-medium text-foreground bg-background shadow-sm rounded-full transition-all"
-            >Home</a
-          >
-          <a
-            href="/first-comment"
-            class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all"
-            >First Comment</a
-          >
-          <a
-            href="/blog/comment-history"
-            class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all"
-            >Blog</a
-          >
-          <a
-            href="/ai-analysis"
-            class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all"
-            >AI Analysis</a
-          >
-          <a
-            href="/export-data"
-            class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all"
-            >Export</a
-          >
-          <a
-            href="/privacy"
-            class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all"
-            >Privacy</a
-          >
-          <a
-            href="/terms"
-            class="px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background rounded-full transition-all"
-            >Terms</a
-          >
-        </div>
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+          onclick="toggleMobileMenu()">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
 
-        <!-- Actions -->
-        <div class="flex items-center gap-3">
-          <button
-            id="theme-toggle"
-            class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary text-muted-foreground transition-colors"
-          >
-            <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
-            <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
-          </button>
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobileMenu"
+      class="hidden md:hidden absolute top-16 left-0 w-full bg-background border-b border-border shadow-2xl p-4 flex flex-col gap-2 z-50 animate-fade-in-up">
+      <a href="/" class="px-4 py-3 text-sm font-bold text-primary bg-primary/5 rounded-lg">Search</a>
+      <a href="/first-comment"
+        class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">First comment</a>
+      <a href="/blog/comment-history"
+        class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Comment History</a>
+      <a href="/ai-analysis"
+        class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">AI Analysis</a>
+      <a href="/export-data"
+        class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg">Export</a>
+    </div>
+  </nav>
 
-          <a
-            href="/index"
-            class="hidden sm:inline-flex items-center justify-center h-9 px-4 rounded-full text-sm font-semibold bg-primary text-white shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all"
-          >
-            Get Started
-          </a>
-
-          <!-- Mobile Menu Button -->
-          <button
-            class="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
-            onclick="toggleMobileMenu()"
-          >
-            <i data-lucide="menu" class="w-6 h-6"></i>
-          </button>
-        </div>
+  <main class="flex-grow pt-24 lg:pt-32 px-4 container mx-auto max-w-[1600px]">
+    <!-- Hero Input Area -->
+    <div class="mb-8 lg:mb-10 max-w-4xl mx-auto" id="heroSection">
+      <div class="text-center mb-6 transition-all duration-500" id="heroHeader">
+        <h1 class="text-2xl md:text-4xl font-bold mb-3 tracking-tight">
+          Advanced Comment Viewer
+        </h1>
+        <p class="text-sm text-muted-foreground">
+          Load millions of comments instantly. No browser lag.
+        </p>
       </div>
 
-      <!-- Mobile Menu Dropdown -->
+      <!-- Input Bar (Persists during loading) -->
       <div
-        id="mobileMenu"
-        class="hidden md:hidden absolute top-16 left-0 w-full bg-background border-b border-border shadow-2xl p-4 flex flex-col gap-2 z-50 animate-fade-in-up"
-      >
-        <a
-          href="/"
-          class="px-4 py-3 text-sm font-bold text-primary bg-primary/5 rounded-lg"
-          >Search</a
-        >
-        <a
-          href="/first-comment"
-          class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg"
-          >First comment</a
-        >
-        <a
-          href="/blog/comment-history"
-          class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg"
-          >Comment History</a
-        >
-        <a
-          href="/ai-analysis"
-          class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg"
-          >AI Analysis</a
-        >
-        <a
-          href="/export-data"
-          class="px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary rounded-lg"
-          >Export</a
-        >
-      </div>
-    </nav>
-
-    <main
-      class="flex-grow pt-24 lg:pt-32 px-4 container mx-auto max-w-[1600px]"
-    >
-      <!-- Hero Input Area -->
-      <div class="mb-8 lg:mb-10 max-w-4xl mx-auto" id="heroSection">
+        class="glass-card p-1.5 rounded-2xl shadow-glow relative group max-w-2xl mx-auto transition-all duration-300 ring-1 ring-border"
+        id="inputWrapper">
         <div
-          class="text-center mb-6 transition-all duration-500"
-          id="heroHeader"
-        >
-          <h1 class="text-2xl md:text-4xl font-bold mb-3 tracking-tight">
-            Advanced Comment Viewer
-          </h1>
-          <p class="text-sm text-muted-foreground">
-            Load millions of comments instantly. No browser lag.
+          class="flex items-center h-12 md:h-14 gap-2 bg-background/50 rounded-xl px-2 border border-transparent focus-within:border-primary/20 focus-within:bg-background transition-colors">
+          <div class="pl-2 text-muted-foreground flex-shrink-0">
+            <i data-lucide="youtube" class="w-5 h-5"></i>
+          </div>
+          <!-- Enhanced Input with Enter key support -->
+          <input type="url" id="urlInput" placeholder="Paste YouTube Link (Video, Short, Live)..."
+            class="flex-1 h-full bg-transparent border-none text-foreground placeholder:text-muted-foreground/60 font-medium text-base md:text-lg focus:outline-none w-full min-w-0"
+            autocomplete="off" enterkeyhint="go" />
+          <!-- Clear Button -->
+          <button id="clearInput" class="hidden text-muted-foreground hover:text-foreground p-2"
+            onclick="clearInputBox()">
+            <i data-lucide="x-circle" class="w-4 h-4"></i>
+          </button>
+
+          <button onclick="handleLoad()" id="loadBtn"
+            class="h-9 md:h-10 px-4 md:px-6 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 shadow-lg hover:shadow-primary/25 whitespace-nowrap text-sm md:text-base flex-shrink-0">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            <span>Load</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Layout -->
+    <div class="grid lg:grid-cols-12 gap-6 items-start relative">
+      <!-- ================= LEFT SIDEBAR ================= -->
+      <aside class="lg:col-span-4 xl:col-span-3 space-y-4 lg:sticky lg:top-24 order-1">
+        <!-- Video Info Panel -->
+        <div id="videoInfoCard" class="glass-card overflow-hidden hidden animate-slide-up transition-all">
+          <!-- Mobile Toggle Header -->
+          <div class="lg:hidden flex items-center justify-between p-3 bg-secondary/30 cursor-pointer select-none"
+            onclick="toggleMobileInfo()">
+            <span class="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <i data-lucide="bar-chart-2" class="w-3 h-3"></i> Video Stats
+            </span>
+            <i data-lucide="chevron-down" id="mobileInfoIcon"
+              class="w-4 h-4 text-muted-foreground transition-transform"></i>
+          </div>
+
+          <div id="videoInfoContent" class="hidden lg:block">
+            <div class="relative group cursor-pointer"
+              onclick="window.open(document.getElementById('urlInput').value, '_blank')">
+              <img id="videoThumbnail" src=""
+                class="w-full h-32 lg:h-40 object-cover transition-transform group-hover:scale-105 duration-700" />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-3">
+                <h3 id="videoTitle"
+                  class="font-bold text-white text-xs md:text-sm line-clamp-2 leading-tight drop-shadow-md">
+                  Loading Title...
+                </h3>
+              </div>
+              <div
+                class="absolute top-2 right-2 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded backdrop-blur-sm">
+                <i data-lucide="external-link" class="w-3 h-3"></i>
+              </div>
+            </div>
+
+            <div class="p-3 lg:p-4 grid grid-cols-3 gap-2 text-center divide-x divide-border/50">
+              <div>
+                <div class="text-[10px] uppercase text-muted-foreground font-bold tracking-wider mb-0.5">
+                  Views
+                </div>
+                <div id="viewCount" class="text-xs lg:text-sm font-bold truncate">
+                  0
+                </div>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase text-muted-foreground font-bold tracking-wider mb-0.5">
+                  Likes
+                </div>
+                <div id="likeCount" class="text-xs lg:text-sm font-bold truncate">
+                  0
+                </div>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase text-muted-foreground font-bold tracking-wider mb-0.5">
+                  Comments
+                </div>
+                <div id="commentCountInfo" class="text-xs lg:text-sm font-bold truncate">
+                  0
+                </div>
+              </div>
+            </div>
+
+            <!-- Real-time Stats -->
+            <div class="px-4 pb-4 border-t border-border pt-3 bg-secondary/10">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs text-muted-foreground">Loaded in Memory</span>
+                <span id="totalCommentsStat" class="text-xs font-bold text-primary">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Filters (Hidden on Mobile) -->
+        <div class="hidden lg:block glass-card p-5">
+          <div class="flex items-center gap-2 mb-5">
+            <div class="p-1.5 bg-primary/10 rounded-md text-primary">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+            </div>
+            <span class="font-bold text-sm">Filters & Sort</span>
+          </div>
+          <!-- Filters Content (Hook for Mobile) -->
+          <div id="desktopFiltersHook" class="space-y-4">
+            <div>
+              <label class="text-xs font-semibold text-muted-foreground mb-1.5 block">Sort Order</label>
+              <div class="relative">
+                <select id="sortSelect" class="custom-input w-full p-2.5 text-sm appearance-none cursor-pointer">
+                  <option value="dateNewest">Newest First</option>
+                  <option value="dateOldest">Oldest First</option>
+                  <option value="likesMost">Most Liked</option>
+                </select>
+                <i data-lucide="chevron-down"
+                  class="w-4 h-4 absolute right-3 top-3 text-muted-foreground pointer-events-none"></i>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-muted-foreground mb-1.5 block">Minimum Likes</label>
+              <div class="relative">
+                <i data-lucide="thumbs-up" class="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground"></i>
+                <input type="number" id="minLikesFilter" min="0" placeholder="0"
+                  class="custom-input w-full p-2.5 pl-9 text-sm" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-xs font-semibold text-muted-foreground mb-1.5 block">From</label>
+                <input type="date" id="startDateFilter" class="custom-input w-full p-2 text-xs" />
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-muted-foreground mb-1.5 block">To</label>
+                <input type="date" id="endDateFilter" class="custom-input w-full p-2 text-xs" />
+              </div>
+            </div>
+            <div class="pt-2 flex gap-2">
+              <button id="applyFiltersBtn"
+                class="flex-1 py-2 bg-foreground text-background text-xs font-bold rounded-lg hover:opacity-90 transition-opacity shadow-sm">
+                Apply Filters
+              </button>
+              <button id="resetFiltersBtn"
+                class="px-3 py-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors border border-border">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Export (Desktop) -->
+        <div class="hidden lg:block glass-card p-5">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="p-1.5 bg-green-500/10 rounded-md text-green-600">
+              <i data-lucide="download" class="w-4 h-4"></i>
+            </div>
+            <span class="font-bold text-sm">Export Data</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="exportComments('csv')"
+              class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-border bg-background hover:border-primary hover:text-primary transition-all text-xs font-medium">
+              CSV
+            </button>
+            <button onclick="exportComments('json')"
+              class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-border bg-background hover:border-primary hover:text-primary transition-all text-xs font-medium">
+              JSON
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ================= RIGHT CONTENT ================= -->
+      <main class="lg:col-span-8 xl:col-span-9 order-2 min-h-[60vh]">
+        <!-- Sticky Search Header (Optimized) -->
+        <div class="sticky top-[70px] lg:top-24 z-30 mb-4 transition-all" id="stickySearch">
+          <div class="glass-card p-2 md:p-3 flex items-center gap-3 shadow-lg ring-1 ring-black/5 rounded-xl">
+            <div class="flex-1 relative group">
+              <i data-lucide="search"
+                class="w-4 h-4 md:w-5 md:h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"></i>
+              <input type="text" id="searchInput" placeholder="Filter current results..."
+                class="w-full pl-9 md:pl-10 pr-4 py-2 bg-transparent border-none text-sm focus:outline-none text-foreground placeholder:text-muted-foreground/70 h-10 rounded-lg" />
+
+              <!-- Keyboard shortcut hint -->
+              <div
+                class="hidden sm:block absolute right-2 top-1/2 -translate-y-1/2 text-[10px] md:text-xs font-mono bg-secondary px-2 py-0.5 rounded text-muted-foreground border border-border">
+                /
+              </div>
+            </div>
+
+            <div class="h-6 w-px bg-border hidden sm:block"></div>
+
+            <div class="text-xs font-medium text-primary whitespace-nowrap px-2 flex items-center gap-1">
+              <span id="commentCount" class="font-bold tabular-nums">0</span>
+              <span class="hidden sm:inline">visible</span>
+            </div>
+
+            <!-- Mobile Filter Trigger -->
+            <button
+              class="lg:hidden p-2.5 bg-secondary rounded-lg text-foreground hover:bg-secondary/80 border border-border active:scale-95 transition-transform"
+              onclick="toggleMobileDrawer(true)">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- State: Empty -->
+        <div id="emptyState"
+          class="glass-card min-h-[400px] md:min-h-[500px] flex flex-col items-center justify-center text-center p-6 md:p-8 border-dashed border-2 border-border/50 rounded-2xl">
+          <div
+            class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-secondary flex items-center justify-center mb-6 animate-pulse-slow">
+            <i data-lucide="message-square" class="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/50"></i>
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-foreground mb-2">
+            Ready to Analyze
+          </h2>
+          <p class="text-sm md:text-base text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed">
+            Paste a YouTube URL above to start streaming comments.
+            <br class="hidden md:block" />
+            <span class="text-xs opacity-75">We support Videos, Shorts, and Live Streams.</span>
+          </p>
+
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 max-w-lg w-full">
+            <div
+              class="p-3 md:p-4 bg-background rounded-xl border border-border/50 shadow-sm flex flex-col items-center">
+              <i data-lucide="zap" class="w-5 h-5 text-yellow-500 mb-2"></i>
+              <div class="text-xs font-medium">Fast Load</div>
+            </div>
+            <div
+              class="p-3 md:p-4 bg-background rounded-xl border border-border/50 shadow-sm flex flex-col items-center">
+              <i data-lucide="filter" class="w-5 h-5 text-blue-500 mb-2"></i>
+              <div class="text-xs font-medium">Deep Search</div>
+            </div>
+            <div
+              class="col-span-2 md:col-span-1 p-3 md:p-4 bg-background rounded-xl border border-border/50 shadow-sm flex flex-col items-center">
+              <i data-lucide="shield" class="w-5 h-5 text-green-500 mb-2"></i>
+              <div class="text-xs font-medium">Secure</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- State: List -->
+        <div id="commentsList" class="hidden space-y-3 md:space-y-4 min-h-[200px] pb-6">
+          <!-- Dynamic Content Injected Here -->
+        </div>
+
+        <!-- Skeleton Loader (Visual feedback during load) -->
+        <div id="skeletonLoader" class="hidden space-y-4 mt-4">
+          <div class="glass-card p-4 md:p-6 animate-pulse flex gap-4">
+            <div class="w-10 h-10 bg-secondary rounded-full"></div>
+            <div class="flex-1 space-y-3">
+              <div class="h-3 bg-secondary rounded w-1/4"></div>
+              <div class="h-3 bg-secondary rounded w-3/4"></div>
+              <div class="h-3 bg-secondary rounded w-1/2"></div>
+            </div>
+          </div>
+          <div class="glass-card p-4 md:p-6 animate-pulse flex gap-4">
+            <div class="w-10 h-10 bg-secondary rounded-full"></div>
+            <div class="flex-1 space-y-3">
+              <div class="h-3 bg-secondary rounded w-1/4"></div>
+              <div class="h-3 bg-secondary rounded w-3/4"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination / Load More -->
+        <div id="loadMoreContainer" class="hidden mt-8 text-center">
+          <!-- Progress indicator -->
+          <div id="loadMoreProgress" class="mb-4 hidden">
+            <div class="max-w-md mx-auto">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-xs text-muted-foreground">Loading comments...</span>
+                <span id="loadMoreProgressText" class="text-xs font-medium text-primary">0%</span>
+              </div>
+              <div class="w-full bg-secondary rounded-full h-1.5 overflow-hidden">
+                <div id="loadMoreProgressBar" class="bg-primary h-1.5 rounded-full transition-all duration-300 ease-out"
+                  style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <button id="loadMoreBtn"
+            class="group relative px-6 py-2.5 md:px-8 md:py-3 rounded-full bg-foreground text-background font-medium hover:scale-105 transition-all duration-200 shadow-lg text-sm md:text-base border border-transparent hover:border-border disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
+            <span class="flex items-center gap-2">
+              <i data-lucide="refresh-cw" class="w-4 h-4 transition-transform group-hover:rotate-180"></i>
+              <span id="loadMoreText">Load More Comments</span>
+            </span>
+
+            <!-- Loading overlay -->
+            <div id="loadMoreOverlay"
+              class="absolute inset-0 bg-foreground/90 rounded-full flex items-center justify-center opacity-0 transition-opacity duration-200 pointer-events-none">
+              <div class="flex items-center gap-2 text-background">
+                <div class="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin"></div>
+                <span class="text-sm font-medium">Loading...</span>
+              </div>
+            </div>
+          </button>
+
+          <!-- Load more info -->
+          <div id="loadMoreInfo" class="mt-3 text-xs text-muted-foreground">
+            <span id="loadMoreStats">Click to load more comments</span>
+          </div>
+
+          <div id="autoLoadContainer" class="mt-4 flex justify-center">
+            <label
+              class="inline-flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-secondary/50 transition-colors select-none">
+              <div class="relative inline-flex items-center">
+                <input type="checkbox" id="autoLoadToggle" class="sr-only peer" />
+                <div
+                  class="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary">
+                </div>
+              </div>
+              <span class="text-xs font-medium text-muted-foreground">Auto-fetch Mode</span>
+            </label>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Mobile Drawer for Filters -->
+    <div id="mobileFilterDrawer" class="mobile-drawer flex flex-col max-h-[85vh]">
+      <div
+        class="p-4 border-b border-border flex justify-between items-center bg-background/50 backdrop-blur-md sticky top-0 z-10 rounded-t-2xl">
+        <h3 class="font-bold text-lg">Filters & Options</h3>
+        <button onclick="toggleMobileDrawer(false)"
+          class="p-2 bg-secondary rounded-full hover:bg-muted transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto no-scrollbar space-y-6">
+        <!-- Filter Logic Cloned Here -->
+        <div id="mobileFilterHook"></div>
+
+        <!-- Mobile Export -->
+        <div class="pt-4 border-t border-border">
+          <span class="text-xs font-bold text-muted-foreground uppercase mb-3 block">Export Data</span>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="exportComments('csv')"
+              class="btn-secondary w-full py-3 rounded-xl border border-border flex items-center justify-center gap-2 font-medium bg-secondary/50 hover:bg-secondary">
+              <i data-lucide="file-text" class="w-4 h-4"></i> CSV
+            </button>
+            <button onclick="exportComments('json')"
+              class="btn-secondary w-full py-3 rounded-xl border border-border flex items-center justify-center gap-2 font-medium bg-secondary/50 hover:bg-secondary">
+              <i data-lucide="code" class="w-4 h-4"></i> JSON
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-border bg-background/50 backdrop-blur-md safe-area-pb">
+        <button onclick="document.getElementById('applyFiltersBtn').click(); toggleMobileDrawer(false);"
+          class="w-full bg-primary text-white py-3.5 rounded-xl font-bold shadow-lg shadow-primary/25 active:scale-95 transition-transform">
+          Show Results
+        </button>
+      </div>
+    </div>
+
+    <!-- Marketing Content (Restored) -->
+    <section class="mt-20 pt-16 border-t border-border/50 hidden lg:block">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold mb-4">
+            Why use this instead of YouTube?
+          </h2>
+          <p class="text-muted-foreground">
+            Native YouTube interfaces are built for watching, not analyzing.
           </p>
         </div>
 
-        <!-- Input Bar (Persists during loading) -->
-        <div
-          class="glass-card p-1.5 rounded-2xl shadow-glow relative group max-w-2xl mx-auto transition-all duration-300 ring-1 ring-border"
-          id="inputWrapper"
-        >
-          <div
-            class="flex items-center h-12 md:h-14 gap-2 bg-background/50 rounded-xl px-2 border border-transparent focus-within:border-primary/20 focus-within:bg-background transition-colors"
-          >
-            <div class="pl-2 text-muted-foreground flex-shrink-0">
-              <i data-lucide="youtube" class="w-5 h-5"></i>
+        <div class="grid md:grid-cols-2 gap-12 items-center mb-24">
+          <div class="glass-card p-8">
+            <div class="flex items-center gap-4 mb-6">
+              <div
+                class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold">The Browser Crash Problem</h3>
             </div>
-            <!-- Enhanced Input with Enter key support -->
-            <input
-              type="url"
-              id="urlInput"
-              placeholder="Paste YouTube Link (Video, Short, Live)..."
-              class="flex-1 h-full bg-transparent border-none text-foreground placeholder:text-muted-foreground/60 font-medium text-base md:text-lg focus:outline-none w-full min-w-0"
-              autocomplete="off"
-              enterkeyhint="go"
-            />
-            <!-- Clear Button -->
-            <button
-              id="clearInput"
-              class="hidden text-muted-foreground hover:text-foreground p-2"
-              onclick="clearInputBox()"
-            >
-              <i data-lucide="x-circle" class="w-4 h-4"></i>
-            </button>
-
-            <button
-              onclick="handleLoad()"
-              id="loadBtn"
-              class="h-9 md:h-10 px-4 md:px-6 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 shadow-lg hover:shadow-primary/25 whitespace-nowrap text-sm md:text-base flex-shrink-0"
-            >
-              <i data-lucide="play" class="w-4 h-4 fill-current"></i>
-              <span>Load</span>
-            </button>
+            <p class="text-muted-foreground leading-relaxed">
+              Scrolling through 10,000+ comments on YouTube consumes massive
+              amounts of RAM (up to 2GB+).
+              <br /><br />
+              <strong>Our Solution:</strong> Virtualized pagination. Read
+              millions of comments, only render 50 at a time.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="glass-card p-6 text-center">
+              <div class="text-3xl font-bold text-primary mb-2">65%</div>
+              <div class="text-xs text-muted-foreground uppercase tracking-widest">
+                Less RAM
+              </div>
+            </div>
+            <div class="glass-card p-6 text-center">
+              <div class="text-3xl font-bold text-primary mb-2">10x</div>
+              <div class="text-xs text-muted-foreground uppercase tracking-widest">
+                Faster Search
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    </section>
+  </main>
 
-      <!-- Main Dashboard Layout -->
-      <div class="grid lg:grid-cols-12 gap-6 items-start relative">
-        <!-- ================= LEFT SIDEBAR ================= -->
-        <aside
-          class="lg:col-span-4 xl:col-span-3 space-y-4 lg:sticky lg:top-24 order-1"
-        >
-          <!-- Video Info Panel -->
-          <div
-            id="videoInfoCard"
-            class="glass-card overflow-hidden hidden animate-slide-up transition-all"
-          >
-            <!-- Mobile Toggle Header -->
-            <div
-              class="lg:hidden flex items-center justify-between p-3 bg-secondary/30 cursor-pointer select-none"
-              onclick="toggleMobileInfo()"
-            >
-              <span
-                class="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2"
-              >
-                <i data-lucide="bar-chart-2" class="w-3 h-3"></i> Video Stats
-              </span>
-              <i
-                data-lucide="chevron-down"
-                id="mobileInfoIcon"
-                class="w-4 h-4 text-muted-foreground transition-transform"
-              ></i>
+  <!-- Footer (Restored) -->
+  <footer class="border-t border-border/50 bg-background/50 py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-12">
+        <div class="col-span-1 md:col-span-2">
+          <a href="/" class="flex items-center gap-2 mb-6 font-bold text-xl">
+            <div class="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center">
+              <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
             </div>
-
-            <div id="videoInfoContent" class="hidden lg:block">
-              <div
-                class="relative group cursor-pointer"
-                onclick="window.open(document.getElementById('urlInput').value, '_blank')"
-              >
-                <img
-                  id="videoThumbnail"
-                  src=""
-                  class="w-full h-32 lg:h-40 object-cover transition-transform group-hover:scale-105 duration-700"
-                />
-                <div
-                  class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-3"
-                >
-                  <h3
-                    id="videoTitle"
-                    class="font-bold text-white text-xs md:text-sm line-clamp-2 leading-tight drop-shadow-md"
-                  >
-                    Loading Title...
-                  </h3>
-                </div>
-                <div
-                  class="absolute top-2 right-2 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded backdrop-blur-sm"
-                >
-                  <i data-lucide="external-link" class="w-3 h-3"></i>
-                </div>
-              </div>
-
-              <div
-                class="p-3 lg:p-4 grid grid-cols-3 gap-2 text-center divide-x divide-border/50"
-              >
-                <div>
-                  <div
-                    class="text-[10px] uppercase text-muted-foreground font-bold tracking-wider mb-0.5"
-                  >
-                    Views
-                  </div>
-                  <div
-                    id="viewCount"
-                    class="text-xs lg:text-sm font-bold truncate"
-                  >
-                    0
-                  </div>
-                </div>
-                <div>
-                  <div
-                    class="text-[10px] uppercase text-muted-foreground font-bold tracking-wider mb-0.5"
-                  >
-                    Likes
-                  </div>
-                  <div
-                    id="likeCount"
-                    class="text-xs lg:text-sm font-bold truncate"
-                  >
-                    0
-                  </div>
-                </div>
-                <div>
-                  <div
-                    class="text-[10px] uppercase text-muted-foreground font-bold tracking-wider mb-0.5"
-                  >
-                    Comments
-                  </div>
-                  <div
-                    id="commentCountInfo"
-                    class="text-xs lg:text-sm font-bold truncate"
-                  >
-                    0
-                  </div>
-                </div>
-              </div>
-
-              <!-- Real-time Stats -->
-              <div
-                class="px-4 pb-4 border-t border-border pt-3 bg-secondary/10"
-              >
-                <div class="flex justify-between items-center mb-1">
-                  <span class="text-xs text-muted-foreground"
-                    >Loaded in Memory</span
-                  >
-                  <span
-                    id="totalCommentsStat"
-                    class="text-xs font-bold text-primary"
-                    >0</span
-                  >
-                </div>
-              </div>
-            </div>
+            YT Finder
+          </a>
+          <p class="text-sm text-muted-foreground leading-relaxed max-w-sm mb-6">
+            The professional standard for YouTube comment analysis and data
+            extraction. Built for creators, marketers, and data analysts.
+          </p>
+          <div class="flex gap-4">
+            <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="twitter"
+                class="w-5 h-5"></i></a>
+            <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="github"
+                class="w-5 h-5"></i></a>
+            <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><i data-lucide="linkedin"
+                class="w-5 h-5"></i></a>
           </div>
+        </div>
 
-          <!-- Desktop Filters (Hidden on Mobile) -->
-          <div class="hidden lg:block glass-card p-5">
-            <div class="flex items-center gap-2 mb-5">
-              <div class="p-1.5 bg-primary/10 rounded-md text-primary">
-                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-              </div>
-              <span class="font-bold text-sm">Filters & Sort</span>
-            </div>
-            <!-- Filters Content (Hook for Mobile) -->
-            <div id="desktopFiltersHook" class="space-y-4">
-              <div>
-                <label
-                  class="text-xs font-semibold text-muted-foreground mb-1.5 block"
-                  >Sort Order</label
-                >
-                <div class="relative">
-                  <select
-                    id="sortSelect"
-                    class="custom-input w-full p-2.5 text-sm appearance-none cursor-pointer"
-                  >
-                    <option value="dateNewest">Newest First</option>
-                    <option value="dateOldest">Oldest First</option>
-                    <option value="likesMost">Most Liked</option>
-                  </select>
-                  <i
-                    data-lucide="chevron-down"
-                    class="w-4 h-4 absolute right-3 top-3 text-muted-foreground pointer-events-none"
-                  ></i>
-                </div>
-              </div>
-              <div>
-                <label
-                  class="text-xs font-semibold text-muted-foreground mb-1.5 block"
-                  >Minimum Likes</label
-                >
-                <div class="relative">
-                  <i
-                    data-lucide="thumbs-up"
-                    class="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground"
-                  ></i>
-                  <input
-                    type="number"
-                    id="minLikesFilter"
-                    min="0"
-                    placeholder="0"
-                    class="custom-input w-full p-2.5 pl-9 text-sm"
-                  />
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label
-                    class="text-xs font-semibold text-muted-foreground mb-1.5 block"
-                    >From</label
-                  >
-                  <input
-                    type="date"
-                    id="startDateFilter"
-                    class="custom-input w-full p-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label
-                    class="text-xs font-semibold text-muted-foreground mb-1.5 block"
-                    >To</label
-                  >
-                  <input
-                    type="date"
-                    id="endDateFilter"
-                    class="custom-input w-full p-2 text-xs"
-                  />
-                </div>
-              </div>
-              <div class="pt-2 flex gap-2">
-                <button
-                  id="applyFiltersBtn"
-                  class="flex-1 py-2 bg-foreground text-background text-xs font-bold rounded-lg hover:opacity-90 transition-opacity shadow-sm"
-                >
-                  Apply Filters
-                </button>
-                <button
-                  id="resetFiltersBtn"
-                  class="px-3 py-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors border border-border"
-                >
-                  <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+        <div>
+          <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">
+            Product
+          </h3>
+          <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+            <li>
+              <a href="/" class="hover:text-primary transition-colors">Search</a>
+            </li>
+            <li>
+              <a href="/ai-analysis" class="hover:text-primary transition-colors">AI Analysis</a>
+            </li>
+            <li>
+              <a href="/export-data" class="hover:text-primary transition-colors">Export</a>
+            </li>
+            <li>
+              <a href="/ai-analysis" class="hover:text-primary transition-colors">AI Analysis</a>
+            </li>
+            <li>
+              <a href="/first-comment" class="hover:text-primary transition-colors">First Comment</a>
+            </li>
+          </ul>
+        </div>
 
-          <!-- Export (Desktop) -->
-          <div class="hidden lg:block glass-card p-5">
-            <div class="flex items-center gap-2 mb-4">
-              <div class="p-1.5 bg-green-500/10 rounded-md text-green-600">
-                <i data-lucide="download" class="w-4 h-4"></i>
-              </div>
-              <span class="font-bold text-sm">Export Data</span>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <button
-                onclick="exportComments('csv')"
-                class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-border bg-background hover:border-primary hover:text-primary transition-all text-xs font-medium"
-              >
-                CSV
-              </button>
-              <button
-                onclick="exportComments('json')"
-                class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-border bg-background hover:border-primary hover:text-primary transition-all text-xs font-medium"
-              >
-                JSON
-              </button>
-            </div>
-          </div>
-        </aside>
+        <div>
+          <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">
+            Resources
+          </h3>
+          <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+            <li>
+              <a href="/blog/comment-history" class="hover:text-primary transition-colors">Blog</a>
+            </li>
+          </ul>
+        </div>
 
-        <!-- ================= RIGHT CONTENT ================= -->
-        <main class="lg:col-span-8 xl:col-span-9 order-2 min-h-[60vh]">
-          <!-- Sticky Search Header (Optimized) -->
-          <div
-            class="sticky top-[70px] lg:top-24 z-30 mb-4 transition-all"
-            id="stickySearch"
-          >
-            <div
-              class="glass-card p-2 md:p-3 flex items-center gap-3 shadow-lg ring-1 ring-black/5 rounded-xl"
-            >
-              <div class="flex-1 relative group">
-                <i
-                  data-lucide="search"
-                  class="w-4 h-4 md:w-5 md:h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"
-                ></i>
-                <input
-                  type="text"
-                  id="searchInput"
-                  placeholder="Filter current results..."
-                  class="w-full pl-9 md:pl-10 pr-4 py-2 bg-transparent border-none text-sm focus:outline-none text-foreground placeholder:text-muted-foreground/70 h-10 rounded-lg"
-                />
-
-                <!-- Keyboard shortcut hint -->
-                <div
-                  class="hidden sm:block absolute right-2 top-1/2 -translate-y-1/2 text-[10px] md:text-xs font-mono bg-secondary px-2 py-0.5 rounded text-muted-foreground border border-border"
-                >
-                  /
-                </div>
-              </div>
-
-              <div class="h-6 w-px bg-border hidden sm:block"></div>
-
-              <div
-                class="text-xs font-medium text-primary whitespace-nowrap px-2 flex items-center gap-1"
-              >
-                <span id="commentCount" class="font-bold tabular-nums">0</span>
-                <span class="hidden sm:inline">visible</span>
-              </div>
-
-              <!-- Mobile Filter Trigger -->
-              <button
-                class="lg:hidden p-2.5 bg-secondary rounded-lg text-foreground hover:bg-secondary/80 border border-border active:scale-95 transition-transform"
-                onclick="toggleMobileDrawer(true)"
-              >
-                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- State: Empty -->
-          <div
-            id="emptyState"
-            class="glass-card min-h-[400px] md:min-h-[500px] flex flex-col items-center justify-center text-center p-6 md:p-8 border-dashed border-2 border-border/50 rounded-2xl"
-          >
-            <div
-              class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-secondary flex items-center justify-center mb-6 animate-pulse-slow"
-            >
-              <i
-                data-lucide="message-square"
-                class="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/50"
-              ></i>
-            </div>
-            <h2 class="text-xl md:text-2xl font-bold text-foreground mb-2">
-              Ready to Analyze
-            </h2>
-            <p
-              class="text-sm md:text-base text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed"
-            >
-              Paste a YouTube URL above to start streaming comments.
-              <br class="hidden md:block" />
-              <span class="text-xs opacity-75"
-                >We support Videos, Shorts, and Live Streams.</span
-              >
-            </p>
-
-            <div
-              class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 max-w-lg w-full"
-            >
-              <div
-                class="p-3 md:p-4 bg-background rounded-xl border border-border/50 shadow-sm flex flex-col items-center"
-              >
-                <i data-lucide="zap" class="w-5 h-5 text-yellow-500 mb-2"></i>
-                <div class="text-xs font-medium">Fast Load</div>
-              </div>
-              <div
-                class="p-3 md:p-4 bg-background rounded-xl border border-border/50 shadow-sm flex flex-col items-center"
-              >
-                <i data-lucide="filter" class="w-5 h-5 text-blue-500 mb-2"></i>
-                <div class="text-xs font-medium">Deep Search</div>
-              </div>
-              <div
-                class="col-span-2 md:col-span-1 p-3 md:p-4 bg-background rounded-xl border border-border/50 shadow-sm flex flex-col items-center"
-              >
-                <i data-lucide="shield" class="w-5 h-5 text-green-500 mb-2"></i>
-                <div class="text-xs font-medium">Secure</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- State: List -->
-          <div
-            id="commentsList"
-            class="hidden space-y-3 md:space-y-4 min-h-[200px] pb-6"
-          >
-            <!-- Dynamic Content Injected Here -->
-          </div>
-
-          <!-- Skeleton Loader (Visual feedback during load) -->
-          <div id="skeletonLoader" class="hidden space-y-4 mt-4">
-            <div class="glass-card p-4 md:p-6 animate-pulse flex gap-4">
-              <div class="w-10 h-10 bg-secondary rounded-full"></div>
-              <div class="flex-1 space-y-3">
-                <div class="h-3 bg-secondary rounded w-1/4"></div>
-                <div class="h-3 bg-secondary rounded w-3/4"></div>
-                <div class="h-3 bg-secondary rounded w-1/2"></div>
-              </div>
-            </div>
-            <div class="glass-card p-4 md:p-6 animate-pulse flex gap-4">
-              <div class="w-10 h-10 bg-secondary rounded-full"></div>
-              <div class="flex-1 space-y-3">
-                <div class="h-3 bg-secondary rounded w-1/4"></div>
-                <div class="h-3 bg-secondary rounded w-3/4"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pagination / Load More -->
-          <div id="loadMoreContainer" class="hidden mt-8 text-center">
-            <button
-              id="loadMoreBtn"
-              class="group relative px-6 py-2.5 md:px-8 md:py-3 rounded-full bg-foreground text-background font-medium hover:scale-105 transition-transform shadow-lg text-sm md:text-base border border-transparent hover:border-border"
-            >
-              <span class="flex items-center gap-2">
-                <i
-                  data-lucide="refresh-cw"
-                  class="w-4 h-4 transition-transform group-hover:rotate-180"
-                ></i>
-                <span id="loadMoreText">Load More Comments</span>
-              </span>
-            </button>
-
-            <div id="autoLoadContainer" class="mt-4 flex justify-center">
-              <label
-                class="inline-flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-secondary/50 transition-colors select-none"
-              >
-                <div class="relative inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    id="autoLoadToggle"
-                    class="sr-only peer"
-                  />
-                  <div
-                    class="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"
-                  ></div>
-                </div>
-                <span class="text-xs font-medium text-muted-foreground"
-                  >Auto-fetch Mode</span
-                >
-              </label>
-            </div>
-          </div>
-        </main>
+        <div>
+          <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">
+            Legal
+          </h3>
+          <ul class="space-y-4 text-sm text-muted-foreground font-medium">
+            <li>
+              <a href="/privacy" class="hover:text-primary transition-colors">Privacy Policy</a>
+            </li>
+            <li>
+              <a href="/terms" class="hover:text-primary transition-colors">Terms of Service</a>
+            </li>
+            <li>
+              <a href="/about" class="hover:text-primary transition-colors">About Us</a>
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <!-- Mobile Drawer for Filters -->
       <div
-        id="mobileFilterDrawer"
-        class="mobile-drawer flex flex-col max-h-[85vh]"
-      >
-        <div
-          class="p-4 border-b border-border flex justify-between items-center bg-background/50 backdrop-blur-md sticky top-0 z-10 rounded-t-2xl"
-        >
-          <h3 class="font-bold text-lg">Filters & Options</h3>
-          <button
-            onclick="toggleMobileDrawer(false)"
-            class="p-2 bg-secondary rounded-full hover:bg-muted transition-colors"
-          >
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-        </div>
-
-        <div class="p-5 overflow-y-auto no-scrollbar space-y-6">
-          <!-- Filter Logic Cloned Here -->
-          <div id="mobileFilterHook"></div>
-
-          <!-- Mobile Export -->
-          <div class="pt-4 border-t border-border">
-            <span
-              class="text-xs font-bold text-muted-foreground uppercase mb-3 block"
-              >Export Data</span
-            >
-            <div class="grid grid-cols-2 gap-3">
-              <button
-                onclick="exportComments('csv')"
-                class="btn-secondary w-full py-3 rounded-xl border border-border flex items-center justify-center gap-2 font-medium bg-secondary/50 hover:bg-secondary"
-              >
-                <i data-lucide="file-text" class="w-4 h-4"></i> CSV
-              </button>
-              <button
-                onclick="exportComments('json')"
-                class="btn-secondary w-full py-3 rounded-xl border border-border flex items-center justify-center gap-2 font-medium bg-secondary/50 hover:bg-secondary"
-              >
-                <i data-lucide="code" class="w-4 h-4"></i> JSON
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="p-4 border-t border-border bg-background/50 backdrop-blur-md safe-area-pb"
-        >
-          <button
-            onclick="document.getElementById('applyFiltersBtn').click(); toggleMobileDrawer(false);"
-            class="w-full bg-primary text-white py-3.5 rounded-xl font-bold shadow-lg shadow-primary/25 active:scale-95 transition-transform"
-          >
-            Show Results
-          </button>
-        </div>
-      </div>
-
-      <!-- Marketing Content (Restored) -->
-      <section class="mt-20 pt-16 border-t border-border/50 hidden lg:block">
-        <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold mb-4">
-              Why use this instead of YouTube?
-            </h2>
-            <p class="text-muted-foreground">
-              Native YouTube interfaces are built for watching, not analyzing.
-            </p>
-          </div>
-
-          <div class="grid md:grid-cols-2 gap-12 items-center mb-24">
-            <div class="glass-card p-8">
-              <div class="flex items-center gap-4 mb-6">
-                <div
-                  class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center"
-                >
-                  <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                </div>
-                <h3 class="text-xl font-bold">The Browser Crash Problem</h3>
-              </div>
-              <p class="text-muted-foreground leading-relaxed">
-                Scrolling through 10,000+ comments on YouTube consumes massive
-                amounts of RAM (up to 2GB+).
-                <br /><br />
-                <strong>Our Solution:</strong> Virtualized pagination. Read
-                millions of comments, only render 50 at a time.
-              </p>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="glass-card p-6 text-center">
-                <div class="text-3xl font-bold text-primary mb-2">65%</div>
-                <div
-                  class="text-xs text-muted-foreground uppercase tracking-widest"
-                >
-                  Less RAM
-                </div>
-              </div>
-              <div class="glass-card p-6 text-center">
-                <div class="text-3xl font-bold text-primary mb-2">10x</div>
-                <div
-                  class="text-xs text-muted-foreground uppercase tracking-widest"
-                >
-                  Faster Search
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Footer (Restored) -->
-    <footer class="border-t border-border/50 bg-background/50 py-12">
-      <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-12">
-          <div class="col-span-1 md:col-span-2">
-            <a href="/" class="flex items-center gap-2 mb-6 font-bold text-xl">
-              <div
-                class="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center"
-              >
-                <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
-              </div>
-              YT Finder
-            </a>
-            <p
-              class="text-sm text-muted-foreground leading-relaxed max-w-sm mb-6"
-            >
-              The professional standard for YouTube comment analysis and data
-              extraction. Built for creators, marketers, and data analysts.
-            </p>
-            <div class="flex gap-4">
-              <a
-                href="#"
-                class="text-muted-foreground hover:text-primary transition-colors"
-                ><i data-lucide="twitter" class="w-5 h-5"></i
-              ></a>
-              <a
-                href="#"
-                class="text-muted-foreground hover:text-primary transition-colors"
-                ><i data-lucide="github" class="w-5 h-5"></i
-              ></a>
-              <a
-                href="#"
-                class="text-muted-foreground hover:text-primary transition-colors"
-                ><i data-lucide="linkedin" class="w-5 h-5"></i
-              ></a>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">
-              Product
-            </h3>
-            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
-              <li>
-                <a href="/" class="hover:text-primary transition-colors"
-                  >Search</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/ai-analysis"
-                  class="hover:text-primary transition-colors"
-                  >AI Analysis</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/export-data"
-                  class="hover:text-primary transition-colors"
-                  >Export</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/ai-analysis"
-                  class="hover:text-primary transition-colors"
-                  >AI Analysis</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/first-comment"
-                  class="hover:text-primary transition-colors"
-                  >First Comment</a
-                >
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">
-              Resources
-            </h3>
-            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
-              <li>
-                <a
-                  href="/blog/comment-history"
-                  class="hover:text-primary transition-colors"
-                  >Blog</a
-                >
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm mb-6 uppercase tracking-wider">
-              Legal
-            </h3>
-            <ul class="space-y-4 text-sm text-muted-foreground font-medium">
-              <li>
-                <a
-                  href="/privacy"
-                  class="hover:text-primary transition-colors"
-                  >Privacy Policy</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/terms"
-                  class="hover:text-primary transition-colors"
-                  >Terms of Service</a
-                >
-              </li>
-              <li>
-                <a
-                  href="/about"
-                  class="hover:text-primary transition-colors"
-                  >About Us</a
-                >
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div
-          class="pt-8 border-t border-border/50 mt-12 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground"
-        >
-          <p>© 2025 YT Comment Finder. All rights reserved.</p>
-          <div class="flex items-center gap-6 mt-4 md:mt-0">
-            <p>Not affiliated with Google LLC.</p>
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-green-500"></span>
-              <span>All Systems Normal</span>
-            </div>
+        class="pt-8 border-t border-border/50 mt-12 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+        <p>© 2025 YT Comment Finder. All rights reserved.</p>
+        <div class="flex items-center gap-6 mt-4 md:mt-0">
+          <p>Not affiliated with Google LLC.</p>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+            <span>All Systems Normal</span>
           </div>
         </div>
       </div>
-    </footer>
+    </div>
+  </footer>
 
-    <script>
+  <script>
+    lucide.createIcons();
+
+    // Setup Theme
+    const html = document.documentElement;
+    const toggleBtn = document.getElementById("theme-toggle");
+
+    function updateTheme() {
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        html.classList.add("dark");
+      } else {
+        html.classList.remove("dark");
+      }
+      lucide.createIcons();
+    }
+    updateTheme();
+
+    toggleBtn.addEventListener("click", () => {
+      html.classList.toggle("dark");
+      localStorage.theme = html.classList.contains("dark") ? "dark" : "light";
+      lucide.createIcons();
+    });
+
+    // Mobile Menu Toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById("mobileMenu");
+      menu.classList.toggle("hidden");
+    }
+
+    // Mobile Input Clear Button Logic
+    const urlInput = document.getElementById("urlInput");
+    const clearBtn = document.getElementById("clearInput");
+    urlInput.addEventListener("input", (e) => {
+      if (e.target.value.length > 0) clearBtn.classList.remove("hidden");
+      else clearBtn.classList.add("hidden");
+    });
+
+    function clearInputBox() {
+      urlInput.value = "";
+      clearBtn.classList.add("hidden");
+      urlInput.focus();
+    }
+
+    // Bind Enter key on main input to Load
+    urlInput.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleLoad();
+      }
+    });
+
+    // Keyboard shortcut for search "/"
+    document.addEventListener("keydown", (e) => {
+      if (
+        e.key === "/" &&
+        document.activeElement !== urlInput &&
+        document.activeElement !== document.getElementById("searchInput")
+      ) {
+        e.preventDefault();
+        document.getElementById("searchInput").focus();
+      }
+    });
+
+    // Socket Setup
+    const socket = io("https://api.ytcommentfinder.com", {
+      path: "/prod-socket/",
+      reconnectionDelayMax: 30000,
+      randomizationFactor: 0,
+    });
+
+    const commentManager = new CommentManager();
+
+    // Mobile Drawer Logic (Cloning Filters)
+    window.addEventListener("load", () => {
+      const desktopFilters = document.getElementById("desktopFiltersHook");
+      const mobileHook = document.getElementById("mobileFilterHook");
+      if (desktopFilters && mobileHook) {
+        mobileHook.innerHTML = desktopFilters.innerHTML;
+
+        // Sync inputs
+        const inputs = mobileHook.querySelectorAll("input, select, button");
+        inputs.forEach((el) => {
+          const oldId = el.id;
+          if (oldId) {
+            el.id = "mobile_" + oldId;
+            el.addEventListener("change", (e) => {
+              const original = document.getElementById(oldId);
+              if (original) {
+                original.value = e.target.value;
+                // Trigger change event on original to run logic
+                const event = new Event("change");
+                original.dispatchEvent(event);
+              }
+            });
+            el.addEventListener("click", (e) => {
+              if (
+                oldId === "applyFiltersBtn" ||
+                oldId === "resetFiltersBtn"
+              ) {
+                document.getElementById(oldId).click();
+              }
+            });
+          }
+        });
+      }
+      lucide.createIcons();
+    });
+
+    function toggleMobileDrawer(show) {
+      const drawer = document.getElementById("mobileFilterDrawer");
+      const overlay = document.getElementById("drawerOverlay");
+      if (show) {
+        drawer.classList.add("open");
+        overlay.classList.add("open");
+        document.body.style.overflow = "hidden";
+      } else {
+        drawer.classList.remove("open");
+        overlay.classList.remove("open");
+        document.body.style.overflow = "";
+      }
+    }
+
+    function toggleMobileInfo() {
+      const content = document.getElementById("videoInfoContent");
+      const icon = document.getElementById("mobileInfoIcon");
+      content.classList.toggle("hidden");
+      if (content.classList.contains("hidden")) {
+        icon.style.transform = "rotate(0deg)";
+      } else {
+        icon.style.transform = "rotate(180deg)";
+      }
+    }
+
+    // Toast Notification
+    function showToast(message, type = "default") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+
+      const icon =
+        type === "success"
+          ? '<i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>'
+          : '<i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i>';
+
+      toast.innerHTML = `${icon} <span>${message}</span>`;
+
+      container.appendChild(toast);
       lucide.createIcons();
 
-      // Setup Theme
-      const html = document.documentElement;
-      const toggleBtn = document.getElementById("theme-toggle");
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(20px)";
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
 
-      function updateTheme() {
-        if (
-          localStorage.theme === "dark" ||
-          (!("theme" in localStorage) &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ) {
-          html.classList.add("dark");
-        } else {
-          html.classList.remove("dark");
-        }
-        lucide.createIcons();
-      }
-      updateTheme();
+    // --- Core Functions ---
 
-      toggleBtn.addEventListener("click", () => {
-        html.classList.toggle("dark");
-        localStorage.theme = html.classList.contains("dark") ? "dark" : "light";
-        lucide.createIcons();
-      });
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+      const results = regex.exec(window.location.href);
+      return results === null
+        ? ""
+        : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
 
-      // Mobile Menu Toggle
-      function toggleMobileMenu() {
-        const menu = document.getElementById("mobileMenu");
-        menu.classList.toggle("hidden");
-      }
+    const videoParam = getUrlParameter("video");
+    if (videoParam) {
+      document.getElementById("urlInput").value = videoParam;
+      setTimeout(() => {
+        handleLoad();
+      }, 500);
+    }
 
-      // Mobile Input Clear Button Logic
+    function handleLoad() {
       const urlInput = document.getElementById("urlInput");
-      const clearBtn = document.getElementById("clearInput");
-      urlInput.addEventListener("input", (e) => {
-        if (e.target.value.length > 0) clearBtn.classList.remove("hidden");
-        else clearBtn.classList.add("hidden");
-      });
+      const btn = document.getElementById("loadBtn");
+      const url = urlInput.value.trim();
 
-      function clearInputBox() {
-        urlInput.value = "";
-        clearBtn.classList.add("hidden");
+      if (url) {
+        // UI Loading State (Non-destructive)
+        const btnText = btn.querySelector("span");
+        const btnIcon = btn.querySelector("i");
+
+        btn.disabled = true;
+        btn.classList.add("opacity-80", "cursor-not-allowed");
+        if (btnText) btnText.textContent = "Loading...";
+        if (btnIcon) {
+          btnIcon.setAttribute("data-lucide", "loader-2");
+          btnIcon.classList.add("animate-spin");
+        }
+        lucide.createIcons();
+
+        // Don't hide empty state yet, wait for data.
+        urlInput.disabled = true;
+
+        const videoId = extractVideoId(url);
+        if (videoId) {
+          socket.emit("idSent", videoId);
+        } else {
+          showToast("Invalid YouTube URL", "error");
+          resetUI(btn);
+        }
+      } else {
         urlInput.focus();
+        urlInput.parentElement.classList.add("ring-2", "ring-red-500");
+        setTimeout(
+          () =>
+            urlInput.parentElement.classList.remove("ring-2", "ring-red-500"),
+          1000
+        );
       }
+    }
 
-      // Bind Enter key on main input to Load
-      urlInput.addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          handleLoad();
-        }
-      });
-
-      // Keyboard shortcut for search "/"
-      document.addEventListener("keydown", (e) => {
-        if (
-          e.key === "/" &&
-          document.activeElement !== urlInput &&
-          document.activeElement !== document.getElementById("searchInput")
-        ) {
-          e.preventDefault();
-          document.getElementById("searchInput").focus();
-        }
-      });
-
-      // Socket Setup
-      const socket = io("https://api.ytcommentfinder.com", {
-        path: "/prod-socket/", 
-        reconnectionDelayMax: 30000,
-        randomizationFactor: 0,
-      });
-
-      const commentManager = new CommentManager();
-
-      // Mobile Drawer Logic (Cloning Filters)
-      window.addEventListener("load", () => {
-        const desktopFilters = document.getElementById("desktopFiltersHook");
-        const mobileHook = document.getElementById("mobileFilterHook");
-        if (desktopFilters && mobileHook) {
-          mobileHook.innerHTML = desktopFilters.innerHTML;
-
-          // Sync inputs
-          const inputs = mobileHook.querySelectorAll("input, select, button");
-          inputs.forEach((el) => {
-            const oldId = el.id;
-            if (oldId) {
-              el.id = "mobile_" + oldId;
-              el.addEventListener("change", (e) => {
-                const original = document.getElementById(oldId);
-                if (original) {
-                  original.value = e.target.value;
-                  // Trigger change event on original to run logic
-                  const event = new Event("change");
-                  original.dispatchEvent(event);
-                }
-              });
-              el.addEventListener("click", (e) => {
-                if (
-                  oldId === "applyFiltersBtn" ||
-                  oldId === "resetFiltersBtn"
-                ) {
-                  document.getElementById(oldId).click();
-                }
-              });
-            }
-          });
-        }
-        lucide.createIcons();
-      });
-
-      function toggleMobileDrawer(show) {
-        const drawer = document.getElementById("mobileFilterDrawer");
-        const overlay = document.getElementById("drawerOverlay");
-        if (show) {
-          drawer.classList.add("open");
-          overlay.classList.add("open");
-          document.body.style.overflow = "hidden";
-        } else {
-          drawer.classList.remove("open");
-          overlay.classList.remove("open");
-          document.body.style.overflow = "";
+    function resetUI(btn) {
+      if (btn) {
+        const btnText = btn.querySelector("span");
+        const btnIcon = btn.querySelector("i");
+        btn.disabled = false;
+        btn.classList.remove("opacity-80", "cursor-not-allowed");
+        if (btnText) btnText.textContent = "Load";
+        if (btnIcon) {
+          btnIcon.setAttribute("data-lucide", "play");
+          btnIcon.classList.remove("animate-spin");
         }
       }
+      document.getElementById("urlInput").disabled = false;
+      lucide.createIcons();
+    }
 
-      function toggleMobileInfo() {
-        const content = document.getElementById("videoInfoContent");
-        const icon = document.getElementById("mobileInfoIcon");
-        content.classList.toggle("hidden");
-        if (content.classList.contains("hidden")) {
-          icon.style.transform = "rotate(0deg)";
-        } else {
-          icon.style.transform = "rotate(180deg)";
-        }
+    function extractVideoId(url) {
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/i,
+        /(?:youtube\.com\/shorts\/)([^&\n?#]+)/i,
+        /(?:youtube\.com\/live\/)([^&\n?#]+)/i,
+      ];
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) return match[1];
       }
+      if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+      return null;
+    }
 
-      // Toast Notification
-      function showToast(message, type = "default") {
-        const container = document.getElementById("toast-container");
-        const toast = document.createElement("div");
-        toast.className = "toast";
+    // --- Socket Event Handlers ---
 
-        const icon =
-          type === "success"
-            ? '<i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>'
-            : '<i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i>';
+    socket.on("videoInfo", ({ videoObject }) => {
+      resetUI(document.getElementById("loadBtn"));
 
-        toast.innerHTML = `${icon} <span>${message}</span>`;
+      if (videoObject !== -1) {
+        // Success! Transition UI
+        document.getElementById("emptyState").classList.add("hidden");
+        document.getElementById("skeletonLoader").classList.remove("hidden");
+        document.getElementById("commentsList").innerHTML = ""; // Clear prev
 
-        container.appendChild(toast);
-        lucide.createIcons();
+        displayVideoInfo(videoObject);
+        showToast("Video found! Fetching comments...", "success");
 
+        // Auto request comments
         setTimeout(() => {
-          toast.style.opacity = "0";
-          toast.style.transform = "translateY(20px)";
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
+          socket.emit("requestAll");
+        }, 100);
+      } else {
+        showToast("Video not found or private", "error");
       }
+    });
 
-      // --- Core Functions ---
+    socket.on(
+      "groupComments",
+      ({ reset, items, showMore, subCount, totalCount }) => {
+        document.getElementById("skeletonLoader").classList.add("hidden");
 
-      function getUrlParameter(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-        const results = regex.exec(window.location.href);
-        return results === null
-          ? ""
-          : decodeURIComponent(results[1].replace(/\+/g, " "));
-      }
-
-      const videoParam = getUrlParameter("video");
-      if (videoParam) {
-        document.getElementById("urlInput").value = videoParam;
-        setTimeout(() => {
-          handleLoad();
-        }, 500);
-      }
-
-      function handleLoad() {
-        const urlInput = document.getElementById("urlInput");
-        const btn = document.getElementById("loadBtn");
-        const url = urlInput.value.trim();
-
-        if (url) {
-          // UI Loading State (Non-destructive)
-          const btnText = btn.querySelector("span");
-          const btnIcon = btn.querySelector("i");
-
-          btn.disabled = true;
-          btn.classList.add("opacity-80", "cursor-not-allowed");
-          if (btnText) btnText.textContent = "Loading...";
-          if (btnIcon) {
-            btnIcon.setAttribute("data-lucide", "loader-2");
-            btnIcon.classList.add("animate-spin");
-          }
-          lucide.createIcons();
-
-          // Don't hide empty state yet, wait for data.
-          urlInput.disabled = true;
-
-          const videoId = extractVideoId(url);
-          if (videoId) {
-            socket.emit("idSent", videoId);
-          } else {
-            showToast("Invalid YouTube URL", "error");
-            resetUI(btn);
-          }
-        } else {
-          urlInput.focus();
-          urlInput.parentElement.classList.add("ring-2", "ring-red-500");
-          setTimeout(
-            () =>
-              urlInput.parentElement.classList.remove("ring-2", "ring-red-500"),
-            1000
-          );
-        }
-      }
-
-      function resetUI(btn) {
-        if (btn) {
-          const btnText = btn.querySelector("span");
-          const btnIcon = btn.querySelector("i");
-          btn.disabled = false;
-          btn.classList.remove("opacity-80", "cursor-not-allowed");
-          if (btnText) btnText.textContent = "Load";
-          if (btnIcon) {
-            btnIcon.setAttribute("data-lucide", "play");
-            btnIcon.classList.remove("animate-spin");
-          }
-        }
-        document.getElementById("urlInput").disabled = false;
-        lucide.createIcons();
-      }
-
-      function extractVideoId(url) {
-        const patterns = [
-          /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/i,
-          /(?:youtube\.com\/shorts\/)([^&\n?#]+)/i,
-          /(?:youtube\.com\/live\/)([^&\n?#]+)/i,
-        ];
-        for (const pattern of patterns) {
-          const match = url.match(pattern);
-          if (match && match[1]) return match[1];
-        }
-        if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
-        return null;
-      }
-
-      // --- Socket Event Handlers ---
-
-      socket.on("videoInfo", ({ videoObject }) => {
-        resetUI(document.getElementById("loadBtn"));
-
-        if (videoObject !== -1) {
-          // Success! Transition UI
-          document.getElementById("emptyState").classList.add("hidden");
-          document.getElementById("skeletonLoader").classList.remove("hidden");
-          document.getElementById("commentsList").innerHTML = ""; // Clear prev
-
-          displayVideoInfo(videoObject);
-          showToast("Video found! Fetching comments...", "success");
-
-          // Auto request comments
-          setTimeout(() => {
-            socket.emit("requestAll");
-          }, 100);
-        } else {
-          showToast("Video not found or private", "error");
-        }
-      });
-
-      socket.on(
-        "groupComments",
-        ({ reset, items, showMore, subCount, totalCount }) => {
-          document.getElementById("skeletonLoader").classList.add("hidden");
-
-          if (reset) commentManager.setCommentsReplace(items);
-          else commentManager.setComments(items);
-
+        if (reset) {
+          commentManager.setCommentsReplace(items);
+          // 重置时显示第一页
           displayCurrentPageComments();
-          updateCommentCount();
-          updateStats();
+        } else {
+          commentManager.setComments(items);
+          // 追加时显示所有已加载的评论
+          displayAllLoadedComments();
+        }
 
-          // Load More Button Logic
-          const loadMoreBtn = document.getElementById("loadMoreBtn");
-          const loadMoreText = document.getElementById("loadMoreText");
-          const loadMoreContainer =
-            document.getElementById("loadMoreContainer");
+        updateCommentCount();
+        updateStats();
 
-          if (loadMoreBtn) {
-            loadMoreBtn.disabled = false;
-            const icon = loadMoreBtn.querySelector("i");
-            if (icon) icon.classList.remove("animate-spin");
+        // Reset Load More Button and hide progress
+        resetLoadMoreButton();
+        const progress = document.getElementById("loadMoreProgress");
+        const progressBar = document.getElementById("loadMoreProgressBar");
+        if (progress) progress.classList.add("hidden");
+        if (progressBar) {
+          progressBar.classList.remove("animate-pulse");
+          progressBar.style.width = "0%";
+        }
+
+        // Update load more stats
+        const stats = commentManager.getStats();
+        const hasMore =
+          stats.filteredCount >
+          (commentManager.getCurrentPage() + 1) * commentManager.pageSize ||
+          stats.totalComments >
+          (commentManager.getCurrentPage() + 1) * commentManager.pageSize;
+
+        const loadMoreContainer = document.getElementById("loadMoreContainer");
+        const statsText = document.getElementById("loadMoreStats");
+
+        if (loadMoreContainer) {
+          if (hasMore) {
+            loadMoreContainer.classList.remove("hidden");
+            const remaining = Math.max(
+              stats.filteredCount - ((stats.currentPage + 1) * commentManager.pageSize),
+              stats.totalComments - commentManager.allComments.length
+            );
+            if (statsText) {
+              statsText.textContent = `${remaining} more comments available`;
+            }
+          } else {
+            loadMoreContainer.classList.add("hidden");
+            if (statsText) {
+              statsText.textContent = "All comments loaded";
+            }
           }
-          if (loadMoreText) loadMoreText.textContent = "Load More Comments";
-
-          const stats = commentManager.getStats();
-          const hasMore =
-            stats.filteredCount >
-              (commentManager.getCurrentPage() + 1) * commentManager.pageSize ||
-            stats.totalComments >
-              (commentManager.getCurrentPage() + 1) * commentManager.pageSize;
-
-          if (loadMoreContainer) {
-            hasMore
-              ? loadMoreContainer.classList.remove("hidden")
-              : loadMoreContainer.classList.add("hidden");
-          }
         }
-      );
+      }
+    );
 
-      socket.on("idInvalid", () => {
-        showToast("Video ID Invalid", "error");
-        resetUI(document.getElementById("loadBtn"));
-      });
-      socket.on("quotaExceeded", () => {
-        showToast("API Quota Exceeded", "error");
-        resetUI(document.getElementById("loadBtn"));
-      });
+    socket.on("idInvalid", () => {
+      showToast("Video ID Invalid", "error");
+      resetUI(document.getElementById("loadBtn"));
+    });
+    socket.on("quotaExceeded", () => {
+      showToast("API Quota Exceeded", "error");
+      resetUI(document.getElementById("loadBtn"));
+    });
 
-      // --- UI Helpers ---
+    // --- UI Helpers ---
 
-      function displayVideoInfo(videoObject) {
-        const videoThumbnail = document.getElementById("videoThumbnail");
-        const videoTitle = document.getElementById("videoTitle");
-        const viewCount = document.getElementById("viewCount");
-        const likeCount = document.getElementById("likeCount");
-        const commentCountInfo = document.getElementById("commentCountInfo");
-        const card = document.getElementById("videoInfoCard");
+    function displayVideoInfo(videoObject) {
+      const videoThumbnail = document.getElementById("videoThumbnail");
+      const videoTitle = document.getElementById("videoTitle");
+      const viewCount = document.getElementById("viewCount");
+      const likeCount = document.getElementById("likeCount");
+      const commentCountInfo = document.getElementById("commentCountInfo");
+      const card = document.getElementById("videoInfoCard");
 
-        if (videoObject.snippet) {
-          const highRes =
-            videoObject.snippet.thumbnails.maxres ||
-            videoObject.snippet.thumbnails.high ||
-            videoObject.snippet.thumbnails.medium;
-          if (highRes) videoThumbnail.src = highRes.url;
-          videoTitle.textContent = videoObject.snippet.title || "Untitled";
-        }
-
-        if (videoObject.statistics) {
-          const fmt = (n) => parseInt(n).toLocaleString();
-          viewCount.textContent = fmt(videoObject.statistics.viewCount || 0);
-          likeCount.textContent = fmt(videoObject.statistics.likeCount || 0);
-          commentCountInfo.textContent = fmt(
-            videoObject.statistics.commentCount || 0
-          );
-        }
-
-        card.classList.remove("hidden");
-        // Mobile: Keep collapsed initially if content is 'hidden lg:block'
+      if (videoObject.snippet) {
+        const highRes =
+          videoObject.snippet.thumbnails.maxres ||
+          videoObject.snippet.thumbnails.high ||
+          videoObject.snippet.thumbnails.medium;
+        if (highRes) videoThumbnail.src = highRes.url;
+        videoTitle.textContent = videoObject.snippet.title || "Untitled";
       }
 
-      function updateStats() {
-        const comments = commentManager.filteredComments;
-        const total = comments.length;
-        document.getElementById("totalCommentsStat").textContent =
-          total.toLocaleString();
+      if (videoObject.statistics) {
+        const fmt = (n) => parseInt(n).toLocaleString();
+        viewCount.textContent = fmt(videoObject.statistics.viewCount || 0);
+        likeCount.textContent = fmt(videoObject.statistics.likeCount || 0);
+        commentCountInfo.textContent = fmt(
+          videoObject.statistics.commentCount || 0
+        );
       }
 
-      function displayCurrentPageComments() {
-        const list = document.getElementById("commentsList");
-        const comments = commentManager.getCurrentPageComments();
+      card.classList.remove("hidden");
+      // Mobile: Keep collapsed initially if content is 'hidden lg:block'
+    }
 
+    function updateStats() {
+      const comments = commentManager.filteredComments;
+      const total = comments.length;
+      document.getElementById("totalCommentsStat").textContent =
+        total.toLocaleString();
+    }
+
+    function displayCurrentPageComments(append = false) {
+      const list = document.getElementById("commentsList");
+      const comments = commentManager.getCurrentPageComments();
+
+      // 如果不是追加模式，清空列表
+      if (!append) {
         list.innerHTML = "";
+      }
 
-        if (comments && comments.length > 0) {
-          comments.forEach((c) => list.appendChild(createCommentElement(c)));
-          list.classList.remove("hidden");
-        } else if (commentManager.getCurrentPage() === 0) {
-          list.innerHTML = `
+      if (comments && comments.length > 0) {
+        comments.forEach((c) => list.appendChild(createCommentElement(c)));
+        list.classList.remove("hidden");
+      } else if (commentManager.getCurrentPage() === 0 && !append) {
+        list.innerHTML = `
                 <div class="p-8 text-center text-muted-foreground glass-card rounded-xl">
                     <p>No comments match your filter.</p>
                     <button onclick="document.getElementById('resetFiltersBtn').click()" class="mt-2 text-primary text-sm font-medium hover:underline">Reset Filters</button>
                 </div>`;
-          list.classList.remove("hidden");
-        }
+        list.classList.remove("hidden");
+      }
+    }
+
+    // 新增函数：显示所有已加载的评论（用于Load More）
+    function displayAllLoadedComments() {
+      const list = document.getElementById("commentsList");
+      const totalPages = commentManager.getCurrentPage() + 1; // 当前页数（从0开始，所以+1）
+
+      list.innerHTML = ""; // 清空列表
+
+      // 显示从第0页到当前页的所有评论
+      for (let page = 0; page < totalPages; page++) {
+        const tempCurrentPage = commentManager.currentPage;
+        commentManager.currentPage = page;
+        const pageComments = commentManager.getCurrentPageComments();
+        pageComments.forEach((c) => list.appendChild(createCommentElement(c)));
+        commentManager.currentPage = tempCurrentPage; // 恢复当前页
       }
 
-      function createCommentElement(comment, isReply = false) {
-        const div = document.createElement("div");
-        div.className = `comment-card relative group ${
-          isReply
-            ? "ml-8 md:ml-12 border-l-2 border-primary/20 bg-secondary/30 mt-2"
-            : ""
+      list.classList.remove("hidden");
+    }
+
+    function createCommentElement(comment, isReply = false) {
+      const div = document.createElement("div");
+      div.className = `comment-card relative group ${isReply
+        ? "ml-8 md:ml-12 border-l-2 border-primary/20 bg-secondary/30 mt-2"
+        : ""
         }`;
-        div.dataset.commentId = comment.id;
+      div.dataset.commentId = comment.id;
 
-        const author = comment.authorDisplayName || "Unknown";
-        const avatar =
-          comment.authorProfileImageUrl ||
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(author)}`;
-        const dateObj = new Date(comment.publishedAt);
-        const date = dateObj.toLocaleDateString();
-        const likes = parseInt(comment.likeCount).toLocaleString();
+      const author = comment.authorDisplayName || "Unknown";
+      const avatar =
+        comment.authorProfileImageUrl ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(author)}`;
+      const dateObj = new Date(comment.publishedAt);
+      const date = dateObj.toLocaleDateString();
+      const likes = parseInt(comment.likeCount).toLocaleString();
 
-        // Search Highlighting
-        let text = comment.textDisplay || "";
-        const searchVal = document.getElementById("searchInput")?.value.trim();
-        if (searchVal) {
-          const regex = new RegExp(
-            `(${searchVal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
-            "gi"
-          );
-          text = text.replace(
-            regex,
-            '<span class="bg-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-200 rounded px-0.5">$1</span>'
-          );
-        }
+      // Search Highlighting
+      let text = comment.textDisplay || "";
+      const searchVal = document.getElementById("searchInput")?.value.trim();
+      if (searchVal) {
+        const regex = new RegExp(
+          `(${searchVal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+          "gi"
+        );
+        text = text.replace(
+          regex,
+          '<span class="bg-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-200 rounded px-0.5">$1</span>'
+        );
+      }
 
-        div.innerHTML = `
+      div.innerHTML = `
             <div class="flex items-start gap-3 md:gap-4">
                 <img src="${avatar}" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary object-cover flex-shrink-0 shadow-sm border border-border" loading="lazy">
                 <div class="flex-1 min-w-0">
@@ -1567,210 +1349,271 @@
                     <div class="text-sm text-foreground/90 leading-relaxed break-words whitespace-pre-wrap font-normal">${text}</div>
                     
                     <div class="flex items-center gap-4 mt-3 opacity-80 sm:opacity-60 group-hover:opacity-100 transition-opacity">
-                        <button onclick="copyCommentText('${
-                          comment.id
-                        }')" class="text-xs flex items-center gap-1 hover:text-primary transition-colors p-1 -ml-1 rounded hover:bg-secondary">
+                        <button onclick="copyCommentText('${comment.id
+        }')" class="text-xs flex items-center gap-1 hover:text-primary transition-colors p-1 -ml-1 rounded hover:bg-secondary">
                            <i data-lucide="copy" class="w-3 h-3"></i> Copy
                         </button>
-                        ${
-                          !isReply &&
-                          (comment.totalReplyCount > 0 ||
-                            comment.replyCount > 0)
-                            ? `
+                        ${!isReply &&
+          (comment.totalReplyCount > 0 ||
+            comment.replyCount > 0)
+          ? `
                         <button  class="text-xs text-primary font-medium flex items-center gap-1 hover:underline p-1 rounded hover:bg-primary/5">
                            <i data-lucide="message-circle" class="w-3 h-3"></i> 
-                           <span id="replyToggleText-${
-                             comment.id
-                           }">Show Replies (${
-                                comment.totalReplyCount || comment.replyCount
-                              })</span>
+                           <span id="replyToggleText-${comment.id
+          }">Show Replies (${comment.totalReplyCount || comment.replyCount
+          })</span>
                         </button>`
-                            : ""
-                        }
+          : ""
+        }
                     </div>
-                    <div id="repliesContainer-${
-                      comment.id
-                    }" class="mt-2 hidden space-y-2 pt-2"></div>
+                    <div id="repliesContainer-${comment.id
+        }" class="mt-2 hidden space-y-2 pt-2"></div>
                 </div>
             </div>
         `;
-        return div;
-      }
+      return div;
+    }
 
-      function updateCommentCount() {
-        const stats = commentManager.getStats();
-        const el = document.getElementById("commentCount");
-        if (el) el.textContent = `${stats.filteredCount.toLocaleString()}`;
-      }
+    function updateCommentCount() {
+      const stats = commentManager.getStats();
+      const el = document.getElementById("commentCount");
+      if (el) el.textContent = `${stats.filteredCount.toLocaleString()}`;
+    }
 
-      // --- Interaction Listeners ---
+    // --- Interaction Listeners ---
 
-      // Search
-      document
-        .getElementById("searchInput")
-        ?.addEventListener("input", function (e) {
-          clearTimeout(window.searchTimeout);
-          window.searchTimeout = setTimeout(() => {
-            commentManager.setFilters({ keywords: e.target.value.trim() });
-            displayCurrentPageComments();
-            updateCommentCount();
-          }, 300);
-        });
-
-      // Sort
-      document
-        .getElementById("sortSelect")
-        ?.addEventListener("change", function (e) {
-          commentManager.setSort(e.target.value);
-          displayCurrentPageComments();
-        });
-
-      // Apply Filters
-      document
-        .getElementById("applyFiltersBtn")
-        ?.addEventListener("click", () => {
-          const minLikes =
-            parseInt(document.getElementById("minLikesFilter").value) || 0;
-          const start = document.getElementById("startDateFilter").value;
-          const end = document.getElementById("endDateFilter").value;
-
-          commentManager.setFilters({
-            minLikes: minLikes,
-            startDate: start ? new Date(start) : null,
-            endDate: end ? new Date(end) : null,
-          });
-          displayCurrentPageComments();
+    // Search
+    document
+      .getElementById("searchInput")
+      ?.addEventListener("input", function (e) {
+        clearTimeout(window.searchTimeout);
+        window.searchTimeout = setTimeout(() => {
+          commentManager.setFilters({ keywords: e.target.value.trim() });
+          // 筛选后显示所有匹配的已加载评论
+          displayAllLoadedComments();
           updateCommentCount();
-          showToast("Filters applied", "success");
-        });
-
-      document
-        .getElementById("resetFiltersBtn")
-        ?.addEventListener("click", () => {
-          document.getElementById("minLikesFilter").value = "";
-          document.getElementById("startDateFilter").value = "";
-          document.getElementById("endDateFilter").value = "";
-          // Reset Mobile inputs too
-          if (document.getElementById("mobile_minLikesFilter"))
-            document.getElementById("mobile_minLikesFilter").value = "";
-
-          commentManager.setFilters({
-            keywords: document.getElementById("searchInput").value,
-            minLikes: 0,
-            startDate: null,
-            endDate: null,
-          });
-          displayCurrentPageComments();
-          updateCommentCount();
-          showToast("Filters reset");
-        });
-
-      // Load More
-      document.getElementById("loadMoreBtn")?.addEventListener("click", () => {
-        loadMoreComments();
+        }, 300);
       });
 
-      function loadMoreComments() {
-        const btn = document.getElementById("loadMoreBtn");
-        const txt = document.getElementById("loadMoreText");
-        const icon = btn.querySelector("i");
+    // Sort
+    document
+      .getElementById("sortSelect")
+      ?.addEventListener("change", function (e) {
+        commentManager.setSort(e.target.value);
+        // 排序后显示所有已加载的评论
+        displayAllLoadedComments();
+      });
 
-        btn.disabled = true;
-        if (txt) txt.textContent = "Loading...";
-        if (icon) icon.classList.add("animate-spin");
+    // Apply Filters
+    document
+      .getElementById("applyFiltersBtn")
+      ?.addEventListener("click", () => {
+        const minLikes =
+          parseInt(document.getElementById("minLikesFilter").value) || 0;
+        const start = document.getElementById("startDateFilter").value;
+        const end = document.getElementById("endDateFilter").value;
 
-        if (commentManager.nextPage()) {
-          displayCurrentPageComments();
-          updateCommentCount();
-          setTimeout(() => {
-            btn.disabled = false;
-            if (txt) txt.textContent = "Load More Comments";
-            if (icon) icon.classList.remove("animate-spin");
-          }, 300);
-        } else {
-          const sort = document.getElementById("sortSelect").value;
-          socket.emit("showMore", {
-            sort: sort,
-            commentNum: commentManager.allComments.length,
-            pageSize: 50, // Keep default or update to 100 per user preference
-          });
-        }
-      }
-
-      // Auto Load
-      let autoLoadInterval;
-      document
-        .getElementById("autoLoadToggle")
-        ?.addEventListener("change", function (e) {
-          if (e.target.checked) {
-            showToast("Auto-fetch enabled");
-            autoLoadInterval = setInterval(() => {
-              const stats = commentManager.getStats();
-              const hasMore =
-                stats.filteredCount >
-                (commentManager.getCurrentPage() + 1) * commentManager.pageSize;
-              const btn = document.getElementById("loadMoreBtn");
-              // Check if button is visible in viewport roughly
-              if (hasMore && btn && !btn.disabled) loadMoreComments();
-            }, 2000);
-          } else {
-            showToast("Auto-fetch disabled");
-            clearInterval(autoLoadInterval);
-          }
+        commentManager.setFilters({
+          minLikes: minLikes,
+          startDate: start ? new Date(start) : null,
+          endDate: end ? new Date(end) : null,
         });
+        // 应用筛选器后显示所有匹配的已加载评论
+        displayAllLoadedComments();
+        updateCommentCount();
+        showToast("Filters applied", "success");
+      });
 
-      // Copy Text
-      function copyCommentText(id) {
-        const el = document.querySelector(`[data-comment-id="${id}"]`);
-        const text = el.querySelector(".whitespace-pre-wrap").innerText;
-        navigator.clipboard.writeText(text);
+    document
+      .getElementById("resetFiltersBtn")
+      ?.addEventListener("click", () => {
+        document.getElementById("minLikesFilter").value = "";
+        document.getElementById("startDateFilter").value = "";
+        document.getElementById("endDateFilter").value = "";
+        // Reset Mobile inputs too
+        if (document.getElementById("mobile_minLikesFilter"))
+          document.getElementById("mobile_minLikesFilter").value = "";
 
-        const btn = el.querySelector("button");
-        const originalHtml = btn.innerHTML;
-        btn.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-green-500"></i> Copied`;
-        lucide.createIcons();
-        setTimeout(() => {
-          btn.innerHTML = originalHtml;
-          lucide.createIcons();
-        }, 1500);
-        showToast("Comment copied to clipboard");
+        commentManager.setFilters({
+          keywords: document.getElementById("searchInput").value,
+          minLikes: 0,
+          startDate: null,
+          endDate: null,
+        });
+        // 重置筛选器后显示所有已加载的评论
+        displayAllLoadedComments();
+        updateCommentCount();
+        showToast("Filters reset");
+      });
+
+    // Load More
+    document.getElementById("loadMoreBtn")?.addEventListener("click", () => {
+      loadMoreComments();
+    });
+
+    function loadMoreComments() {
+      const btn = document.getElementById("loadMoreBtn");
+      const txt = document.getElementById("loadMoreText");
+      const icon = btn.querySelector("i");
+      const overlay = document.getElementById("loadMoreOverlay");
+      const progress = document.getElementById("loadMoreProgress");
+      const progressBar = document.getElementById("loadMoreProgressBar");
+      const progressText = document.getElementById("loadMoreProgressText");
+      const statsText = document.getElementById("loadMoreStats");
+
+      // Show loading state
+      btn.disabled = true;
+      if (overlay) {
+        overlay.style.opacity = "1";
+        overlay.style.pointerEvents = "auto";
       }
 
-      function exportComments(format) {
-        const data = commentManager.filteredComments;
-        if (!data.length) return showToast("No comments to export", "error");
+      // Update stats
+      const stats = commentManager.getStats();
+      const remaining = stats.filteredCount - (stats.currentPage * commentManager.pageSize);
+      if (statsText) {
+        statsText.textContent = `Loading... ${remaining} comments remaining`;
+      }
 
-        if (format === "json") {
-          const blob = new Blob([JSON.stringify(data, null, 2)], {
-            type: "application/json",
-          });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "comments_export.json";
-          a.click();
+      if (commentManager.nextPage()) {
+        // Local pagination - show progress simulation
+        if (progress) progress.classList.remove("hidden");
+
+        let progressValue = 0;
+        const progressInterval = setInterval(() => {
+          progressValue += 20;
+          if (progressBar) progressBar.style.width = progressValue + "%";
+          if (progressText) progressText.textContent = progressValue + "%";
+
+          if (progressValue >= 100) {
+            clearInterval(progressInterval);
+            setTimeout(() => {
+              // 使用新的显示所有已加载评论的函数
+              displayAllLoadedComments();
+              updateCommentCount();
+              resetLoadMoreButton();
+              if (progress) progress.classList.add("hidden");
+
+              // Update final stats
+              const newStats = commentManager.getStats();
+              const newRemaining = newStats.filteredCount - (newStats.currentPage * commentManager.pageSize);
+              if (statsText) {
+                if (newRemaining > 0) {
+                  statsText.textContent = `${newRemaining} more comments available`;
+                } else {
+                  statsText.textContent = "All comments loaded";
+                }
+              }
+            }, 200);
+          }
+        }, 60);
+      } else {
+        // Server request - show indeterminate progress
+        if (progress) progress.classList.remove("hidden");
+        if (progressBar) {
+          progressBar.style.width = "100%";
+          progressBar.classList.add("animate-pulse");
+        }
+        if (progressText) progressText.textContent = "Fetching...";
+
+        const sort = document.getElementById("sortSelect").value;
+        socket.emit("showMore", {
+          sort: sort,
+          commentNum: commentManager.allComments.length,
+          pageSize: 50,
+        });
+      }
+    }
+
+    function resetLoadMoreButton() {
+      const btn = document.getElementById("loadMoreBtn");
+      const txt = document.getElementById("loadMoreText");
+      const icon = btn.querySelector("i");
+      const overlay = document.getElementById("loadMoreOverlay");
+
+      btn.disabled = false;
+      if (txt) txt.textContent = "Load More Comments";
+      if (icon) icon.classList.remove("animate-spin");
+      if (overlay) {
+        overlay.style.opacity = "0";
+        overlay.style.pointerEvents = "none";
+      }
+    }
+
+    // Auto Load
+    let autoLoadInterval;
+    document
+      .getElementById("autoLoadToggle")
+      ?.addEventListener("change", function (e) {
+        if (e.target.checked) {
+          showToast("Auto-fetch enabled");
+          autoLoadInterval = setInterval(() => {
+            const stats = commentManager.getStats();
+            const hasMore =
+              stats.filteredCount >
+              (commentManager.getCurrentPage() + 1) * commentManager.pageSize;
+            const btn = document.getElementById("loadMoreBtn");
+            // Check if button is visible in viewport roughly
+            if (hasMore && btn && !btn.disabled) loadMoreComments();
+          }, 2000);
         } else {
-          let csv = "Author,Date,Likes,Comment\n";
-          data.forEach((c) => {
-            csv += `"${(c.authorDisplayName || "").replace(/"/g, '""')}","${
-              c.publishedAt
+          showToast("Auto-fetch disabled");
+          clearInterval(autoLoadInterval);
+        }
+      });
+
+    // Copy Text
+    function copyCommentText(id) {
+      const el = document.querySelector(`[data-comment-id="${id}"]`);
+      const text = el.querySelector(".whitespace-pre-wrap").innerText;
+      navigator.clipboard.writeText(text);
+
+      const btn = el.querySelector("button");
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-green-500"></i> Copied`;
+      lucide.createIcons();
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        lucide.createIcons();
+      }, 1500);
+      showToast("Comment copied to clipboard");
+    }
+
+    function exportComments(format) {
+      const data = commentManager.filteredComments;
+      if (!data.length) return showToast("No comments to export", "error");
+
+      if (format === "json") {
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "comments_export.json";
+        a.click();
+      } else {
+        let csv = "Author,Date,Likes,Comment\n";
+        data.forEach((c) => {
+          csv += `"${(c.authorDisplayName || "").replace(/"/g, '""')}","${c.publishedAt
             }",${c.likeCount},"${(c.textDisplay || "")
               .replace(/"/g, '""')
               .replace(/\n/g, " ")}"\n`;
-          });
-          const blob = new Blob([csv], { type: "text/csv" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "comments_export.csv";
-          a.click();
-        }
-        showToast(
-          `Exported ${data.length} comments as ${format.toUpperCase()}`,
-          "success"
-        );
-        toggleMobileDrawer(false);
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "comments_export.csv";
+        a.click();
       }
-    </script>
-  </body>
+      showToast(
+        `Exported ${data.length} comments as ${format.toUpperCase()}`,
+        "success"
+      );
+      toggleMobileDrawer(false);
+    }
+  </script>
+</body>
+
 </html>
